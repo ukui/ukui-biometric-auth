@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+#DEBHELPER#
+
+pam-auth-update --package --remove pam-biometric

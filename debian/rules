@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export QT_SELECT := qt5
+export NO_PKG_MANGLE=1
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+DESTDIR_POLKIT=../debian/ukui-polkit
+DESTDIR_PAM=../debian/libpam-biometric
+DEB_PAM_PATH=debian/libpam-biometric/lib/security
+LIB_PATH=/usr/lib/$(DEB_HOST_MULTIARCH)
+UKUI_BIOMETRIC_PATH=/usr/share/ukui-biometric
+MAN_DIR=/usr/share/man/man1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	 make all UKUI_BIOMETRIC=$(UKUI_BIOMETRIC_PATH) mode=debug
+	 cd polkit-agent/data && sed -i 's/@LIB_PATH/\/usr\/lib\/$(DEB_HOST_MULTIARCH)/g' polkit-ukui-authentication-agent-1.desktop
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR_POLKIT=$(DESTDIR_POLKIT) DESTDIR_PAM=$(DESTDIR_PAM) LIB_PATH=$(LIB_PATH) UKUI_BIOMETRIC=$(UKUI_BIOMETRIC_PATH)
+	mkdir debian/libpam-biometric${UKUI_BIOMETRIC_PATH}/images && install -D images/* debian/libpam-biometric${UKUI_BIOMETRIC_PATH}/images/

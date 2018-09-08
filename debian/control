@@ -1,0 +1,41 @@
+Source: ukui-biometric-auth
+Section: admin
+Priority: optional
+Maintainer: Kylin Team <team+kylin@tracker.debian.org>
+Uploaders: handsome_feng <jianfengli@ubuntukylin.com>
+Build-Depends: debhelper (>= 11),
+               qtbase5-dev,
+               libpam-dev,
+               libpolkit-qt5-1-dev,
+               qttools5-dev-tools
+Standards-Version: 4.2.1
+Homepage: https://github.com/ukui/ukui-biometric-auth
+Vcs-Git: https://github.com/ukui/ukui-biometric.git
+Vcs-Browser: https://github.com/ukui/ukui-biometric-auth
+
+Package: libpam-biometric
+Architecture: any
+Depends: libqt5widgets5,
+         libqt5gui5,
+         libqt5core5a,
+         ${shlibs:Depends},
+         ${misc:Depends}
+Suggests: biometric-auth
+Description: Insertable authentication module for PAM
+ The indispensable part for biometric authentication in
+ ukui desktop environment.
+ This package contains a modules for PAM.
+
+Package: ukui-polkit
+Architecture: any
+Depends: libqt5widgets5,
+         libqt5gui5,
+         libqt5core5a,
+         libpolkit-qt5-1-1,
+         ${shlibs:Depends},
+         ${misc:Depends}
+Suggests: biometric-auth
+Description: UKUI authentication agent for PolicyKit-1
+ The ukui-polkit package supports general authentication and
+ biometric authentication that the service is provided by the
+ biometric-auth package.
