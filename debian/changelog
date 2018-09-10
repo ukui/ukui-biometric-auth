@@ -1,5 +1,5 @@
 ukui-biometric-auth (1.0.0-1) unstable; urgency=medium
 
-  * Initial release
+  * Initial release. (Closes: #908469)
 
  -- handsome_feng <jianfengli@ubuntukylin.com>  Sat, 08 Sep 2018 16:58:35 +0800
