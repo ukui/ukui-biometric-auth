@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 11),
                qtbase5-dev,
                libpam-dev,
                libpolkit-qt5-1-dev,
-               qttools5-dev-tools
+               qttools5-dev-tools,
+			   pkg-config
 Standards-Version: 4.2.1
 Homepage: https://github.com/ukui/ukui-biometric-auth
 Vcs-Git: https://github.com/ukui/ukui-biometric.git
