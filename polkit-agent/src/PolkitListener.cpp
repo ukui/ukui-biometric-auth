@@ -40,7 +40,6 @@ PolkitListener::PolkitListener(QObject *parent)
     : Listener(parent),
       inProgress(false),
       currentIdentity(0),
-      session(nullptr),
       mainWindow(nullptr)
 {
 }
@@ -51,10 +50,10 @@ PolkitListener::~PolkitListener()
 
 /* initiateAuthentication message from polkit */
 void PolkitListener::initiateAuthentication(
-	const QString &actionId, const QString &message,
-	const QString &iconName, const PolkitQt1::Details &details,
-	const QString &cookie, const PolkitQt1::Identity::List &identities,
-	PolkitQt1::Agent::AsyncResult *result)
+    const QString &actionId, const QString &message,
+    const QString &iconName, const PolkitQt1::Details &details,
+    const QString &cookie, const PolkitQt1::Identity::List &identities,
+    PolkitQt1::Agent::AsyncResult *result)
 {
     if(inProgress){
         result->setError(tr("Another client is already authenticating, please try again later."));
@@ -83,7 +82,7 @@ void PolkitListener::initiateAuthentication(
         }
     }
 
-	qDebug() << "Initiating authentication";
+    qDebug() << "Initiating authentication";
     qDebug() << "icon name: " << iconName;
     qDebug() << "identities: " << usersList;
     qDebug() << "message: " << message;
@@ -95,15 +94,15 @@ void PolkitListener::initiateAuthentication(
 
     this->inProgress = true;
 
-	this->identities = identities;
-	this->cookie = cookie;
-	this->result = result;
-	session.clear();
-	if (identities.length() == 1) {
-		this->currentIdentity = identities[0];
-	} else {
+    this->identities = identities;
+    this->cookie = cookie;
+    this->result = result;
+    session.clear();
+    if (identities.length() == 1) {
+    	this->currentIdentity = identities[0];
+    } else {
         currentIdentity = identities[0];
-	}
+    }
 
     /* Create the polkit window */
 
@@ -149,7 +148,7 @@ void PolkitListener::initiateAuthentication(
     });
 
     numTries = 0;
-	wasCancelled = false;
+    wasCancelled = false;
     wasSwitchToBiometric = false;
 
     startAuthentication();
@@ -157,10 +156,10 @@ void PolkitListener::initiateAuthentication(
 
 void PolkitListener::finishObtainPrivilege()
 {
-	/* Number of tries increase only when some user is selected */
-	if (currentIdentity.isValid()) {
-		numTries++;
-	}
+    /* Number of tries increase only when some user is selected */
+    if (currentIdentity.isValid()) {
+    	numTries++;
+    }
     qDebug().noquote() << QString("Finishing obtaining "
                     "privileges (G:%1, C:%2, D:%3).")
                     .arg(gainedAuthorization)
@@ -175,18 +174,18 @@ void PolkitListener::finishObtainPrivilege()
             return;
         }
     }
-	if (!session.isNull()) {
-		session.data()->result()->setCompleted();
-	} else {
-		result->setCompleted();
-	}
-	session.data()->deleteLater();
+    if (!session.isNull()) {
+    	session.data()->result()->setCompleted();
+    } else {
+    	result->setCompleted();
+    }
+    session.data()->deleteLater();
     if (mainWindow) {
         delete (mainWindow);
         mainWindow = NULL;
     }
     this->inProgress = false;
-	qDebug() << "Finish obtain authorization:" << gainedAuthorization;
+    qDebug() << "Finish obtain authorization:" << gainedAuthorization;
 }
 
 void establishToBioPAM()
@@ -212,22 +211,22 @@ void PolkitListener::startAuthentication()
         session.data()->deleteLater();
     }
 
-	/* We will create a new session only when some user is selected */
-	if (currentIdentity.isValid()) {
+    /* We will create a new session only when some user is selected */
+    if (currentIdentity.isValid()) {
 
         establishToBioPAM();
 
-		session = new Session(currentIdentity, cookie, result);
-		connect(session.data(), SIGNAL(request(QString, bool)), this,
+    	session = new Session(currentIdentity, cookie, result);
+    	connect(session.data(), SIGNAL(request(QString, bool)), this,
                 SLOT(onShowPrompt(QString,bool)));
-		connect(session.data(), SIGNAL(completed(bool)), this,
+    	connect(session.data(), SIGNAL(completed(bool)), this,
                 SLOT(onAuthCompleted(bool)));
-		connect(session.data(), SIGNAL(showError(QString)), this,
+    	connect(session.data(), SIGNAL(showError(QString)), this,
                 SLOT(onShowError(QString)));
         connect(session.data(), SIGNAL(showInfo(QString)), this,
                 SLOT(onShowError(QString)));
-		session.data()->initiate();
-	}
+    	session.data()->initiate();
+    }
 
     mainWindow->clearEdit();
 }
@@ -249,14 +248,14 @@ void PolkitListener::onShowPrompt(const QString &prompt, bool echo)
 
 void PolkitListener::onShowError(const QString &text)
 {
-    qDebug() << "[Polkit]:"	<< "Error:" << text;
+    qDebug() << "[Polkit]:"    << "Error:" << text;
     if(mainWindow)
         mainWindow->setMessage(text);
 }
 
 void PolkitListener::onShowInfo(const QString &text)
 {
-    qDebug() << "[Polkit]:"	<< "Info:" << text;
+    qDebug() << "[Polkit]:"    << "Info:" << text;
     if(mainWindow)
         mainWindow->setMessage(text);
 }
@@ -275,13 +274,13 @@ void PolkitListener::onAuthCompleted(bool gainedAuthorization)
 
 bool PolkitListener::initiateAuthenticationFinish()
 {
-	qDebug() << "initiateAuthenticationFinish.";
-	return true;
+    qDebug() << "initiateAuthenticationFinish.";
+    return true;
 }
 
 void PolkitListener::cancelAuthentication()
 {
-	wasCancelled = true;
-	qDebug() << "cancelAuthentication.";
-	finishObtainPrivilege();
+    wasCancelled = true;
+    qDebug() << "cancelAuthentication.";
+    finishObtainPrivilege();
 }

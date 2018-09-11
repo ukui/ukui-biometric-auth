@@ -4,7 +4,7 @@ TEMPLATE = lib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += staticlib debug
+CONFIG += staticlib debug c++11
 
 DESTDIR = $$PWD/
 
