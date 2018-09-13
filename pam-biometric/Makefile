@@ -26,8 +26,8 @@ install:
 	install -D pam_biometric.so $(DESTDIR_PAM)$(PAM_MODULE_DIR)/pam_biometric.so
 	install -m 644 -D pam-configs/pam-biometric $(DESTDIR_PAM)$(PAM_CONFIGS)/pam-biometric
 	install -m 644 -D data/biometric-auth.conf $(DESTDIR_PAM)$(UKUI_BIOMETRIC)/biometric-auth.conf
-	install -m 644 -D data/org.freedesktop.plicykit.pkexec.biometric-auth-gui.policy \
-		$(DESTDIR_PAM)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.biometric-auth-gui.policy
+	install -m 644 -D data/org.freedesktop.plicykit.pkexec.bioctl.policy \
+		$(DESTDIR_PAM)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.bioctl.policy
 	install -m 755 -D utils/bioctl $(DESTDIR_PAM)/bin/bioctl
 
 uninstall:
@@ -35,7 +35,7 @@ uninstall:
 	rm -f $(DESTDIR_PAM)$(PAM_CONFIGS)/pam-biometric
 	rm -f $(DESTDIR_PAM)$(UKUI_BIOMETRIC)/biometric-auth.conf
 	rm -f $(DESTDIR_PAM)/bin/bioctl
-	rm -f $(DESTDIR_PAM)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.biometric-auth-gui.policy
+	rm -f $(DESTDIR_PAM)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.bioctl.policy
 
 clean:
 	rm -f *.o pam_biometric.so

@@ -1,5 +1,6 @@
 QPushButton{
     border:none;
+    outline: none;
 }
 
 #MainWindow{
@@ -20,7 +21,7 @@ QPushButton{
 }
 
 #btnDetails {
-    icon-size: 16px;
+    icon-size: 14px;
 }
 
 #btnCancel::hover, #btnAuth::hover {

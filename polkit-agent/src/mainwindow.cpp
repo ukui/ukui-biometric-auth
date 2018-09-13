@@ -65,8 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug() << "biometric authentication complete: " << uid << ret;
         if(uid == getUid(userName) && ret)
             accept(BIOMETRIC_SUCESS);
-        else
-            accept(BIOMETRIC_FAILED);
+//        else
+//            accept(BIOMETRIC_FAILED);
     });
 
     connect(widgetBioAuth, &BioAuthWidget::selectDevice,
@@ -308,8 +308,6 @@ uid_t MainWindow::getUid(const QString &userName)
 
 void MainWindow::switchWidget(Mode mode)
 {
-    qDebug() << mode;
-
     ui->widgetPasswdAuth->hide();
     ui->btnAuth->hide();
     widgetBioAuth->hide();
@@ -317,7 +315,7 @@ void MainWindow::switchWidget(Mode mode)
 
     switch(mode){
     case PASSWORD:
-//        setMinimumWidth(420);
+        setMinimumWidth(420);
         ui->widgetPasswdAuth->show();
         ui->lePassword->setFocus();
         ui->btnAuth->show();
