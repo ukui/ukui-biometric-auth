@@ -18,11 +18,6 @@
 #include "biotypes.h"
 #include <QDBusInterface>
 
-QStringList bioTypeStrings = QStringList{QObject::tr("FingerPrint"),
-                          QObject::tr("FingerVein"),
-                          QObject::tr("Iris"),
-                          QObject::tr("Face"),
-                          QObject::tr("VoicePrint")};
 
 QDBusArgument &operator<<(QDBusArgument &argument, const DeviceInfo &deviceInfo)
 {
@@ -65,4 +60,21 @@ QDebug& operator<<(QDebug &stream, const DeviceInfo &deviceInfo)
     stream << deviceInfo.device_id << deviceInfo.device_shortname
            << deviceInfo.biotype << deviceInfo.device_available;
     return stream;
+}
+
+QString bioTypeToString(int type)
+{
+    switch(type) {
+    case BIOTYPE_FINGERPRINT:
+        return ("FingerPrint");
+    case BIOTYPE_FINGERVEIN:
+        return ("FingerVein");
+    case BIOTYPE_IRIS:
+        return ("Iris");
+    case BIOTYPE_FACE:
+        return ("Face");
+    case BIOTYPE_VOICEPRINT:
+        return ("VoicePrint");
+    }
+    return QString();
 }

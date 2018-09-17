@@ -1,5 +1,6 @@
 QPushButton{
     border:none;
+    outline:none;
 }
 
 /*QLabel{
@@ -22,10 +23,6 @@ QPushButton{
     border: 1px solid gray;
     min-height: 24px;
     min-width: 80px;
-}
-
-#btnDetails {
-    icon-size: 16px;
 }
 
 #btnCancel::hover, #btnAuth::hover {

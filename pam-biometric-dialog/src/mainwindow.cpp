@@ -18,13 +18,22 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDesktopWidget>
+
+#include <sys/types.h>
+#include <pwd.h>
+
 #include "generic.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QWidget(parent),
+MainWindow::MainWindow(const QString &userName, QDialog *parent) :
+    QDialog(parent),
     ui(new Ui::MainWindow)
 {
+    struct passwd *pwd = getpwnam(userName.toLocal8Bit().constData());
+    uid = pwd->pw_uid;
+
     ui->setupUi(this);
+    setWindowTitle(tr("Biometric Authentication"));
+    setWindowIcon(QIcon::fromTheme("dialog-password"));
 
     widgetBioAuth = new BioAuthWidget(this);
     widgetBioAuth->setMaximumWidth(230);
@@ -34,10 +43,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainLayout->addWidget(widgetBioAuth);
     ui->mainLayout->addWidget(widgetBioDevices);
 
+
     connect(widgetBioDevices, &BioDevicesWidget::deviceChanged,
             this, [&](const DeviceInfo &device){
+        qDebug() << "device changed: " << device;
         widgetBioAuth->startAuth(1000, device);
-        switchWidget(DEVICES);
+        switchWidget(BIOMETRIC);
     });
 
     connect(widgetBioDevices, &BioDevicesWidget::back,
@@ -45,18 +56,24 @@ MainWindow::MainWindow(QWidget *parent) :
         switchWidget(BIOMETRIC);
     });
 
+    connect(widgetBioDevices, &BioDevicesWidget::deviceCountChanged,
+            this, [&](int count) {
+        widgetBioAuth->setMoreDevices(count > 1);
+    });
+
     connect(widgetBioAuth, &BioAuthWidget::authComplete,
-            this, [&](uid_t uid, bool ret){
-        qDebug() << "biometric authentication complete: " << uid << ret;
-        if(uid == 1000 && ret)
+            this, [&](uid_t _uid, bool ret){
+        qDebug() << "biometric authentication complete: " << _uid << ret;
+        if(uid == _uid && ret) {
+            qDebug() << "authentication success";
             exit(BIO_SUCCESS);
-        else
-            exit(BIO_FAILED);
+
+        }
     });
 
     connect(widgetBioAuth, &BioAuthWidget::selectDevice,
             this, [&]{
-        widgetBioDevices->init();
+        widgetBioDevices->init(uid);
         widgetBioAuth->hide();
         widgetBioDevices->show();
     });
@@ -66,12 +83,14 @@ MainWindow::MainWindow(QWidget *parent) :
         exit(BIO_IGNORE);
     });
 
-    DeviceInfo *defaultDevice = bioDevices.getDefaultDevice();
+    widgetBioDevices->init(uid);
+
+    DeviceInfo *defaultDevice = bioDevices.getDefaultDevice(uid);
     if(!defaultDevice) {
         LOG() << "no available device";
         exit(BIO_IGNORE);
     }
-    widgetBioAuth->startAuth(1000, *defaultDevice);
+    widgetBioAuth->startAuth(uid, *defaultDevice);
     switchWidget(BIOMETRIC);
 
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);

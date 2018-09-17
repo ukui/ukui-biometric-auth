@@ -32,11 +32,12 @@ class BioDevicesWidget : public QWidget
 public:
     explicit BioDevicesWidget(QWidget *parent = 0);
     ~BioDevicesWidget();
-    void init();
+    void init(uid_t uid);
 
 signals:
     void back();
     void deviceChanged(const DeviceInfo &device);
+    void deviceCountChanged(int count);
 
 private slots:
     void on_btnBack_clicked();
@@ -50,6 +51,8 @@ private:
     Ui::BioDevicesWidget *ui;
     BioDevices bioDevices;
     QMap<int, QList<DeviceInfo>> devicesMap;
+
+    uid_t uid;
 };
 
 #endif // BIODEVICESWIDGET_H

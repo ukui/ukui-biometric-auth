@@ -17,20 +17,19 @@
 **/
 #include "biodevices.h"
 #include <QDBusInterface>
+#include <QSettings>
 
-//bool BioDevices::isFirst = true;
-//QList<DeviceInfo*>  BioDevices::deviceInfos;
-//QMap<int, QList<DeviceInfo>>      BioDevices::deviceInfosMap;
+#include <sys/types.h>
+#include <pwd.h>
+
+#include "generic.h"
+
 
 BioDevices::BioDevices(QObject *parent)
     : QObject(parent)
 {
     connectToService();
     getDevicesList();
-//    if(isFirst){
-//        getDevicesList();
-//        isFirst = false;
-//    }
 }
 
 void BioDevices::connectToService()
@@ -88,67 +87,15 @@ void BioDevices::getDevicesList()
     }
 }
 
-/**
- * 获取设备中的生物特征列表
- */
-void BioDevices::getFeaturesList(qint32 uid)
-{
-    if(deviceInfosMap.contains(uid)){
-        LOG() << "this uid's deviceInfos saved";
-        return;
-    }
-
-    deviceInfosMap[uid] = QList<DeviceInfo>();
-
-    for(int i = 0; i < deviceInfos.size(); i++) {
-        DeviceInfo *deviceInfo = deviceInfos.at(i);
-        QDBusMessage msg = serviceInterface->call("GetFeatureList", QVariant(deviceInfo->device_id),
-                               QVariant(uid), QVariant(0), QVariant(-1));
-        if(msg.type() == QDBusMessage::ErrorMessage){
-            LOG() << msg.errorMessage();
-            continue;
-        }
-        int featuresNum = msg.arguments().at(0).toInt();
-
-        if(featuresNum > 0 && !deviceInfosMap[uid].contains(*deviceInfo))
-            deviceInfosMap[uid].push_back(*deviceInfo);
-    }
-    LOG() << "there are" << deviceInfosMap[uid].size()
-          << "devices enrolled features";
-}
 
 int BioDevices::count()
 {
     return deviceInfos.size();
 }
 
-int BioDevices::getDevicesCount(qint32 uid)
-{
-    getFeaturesList(uid);
-    return deviceInfosMap[uid].size();
-}
-
-int BioDevices::getDevicesCount()
-{
-    return deviceInfos.size();
-}
-
-QMap<int, QList<DeviceInfo> > BioDevices::getDevicesList(uid_t uid)
-{
-    getFeaturesList(uid);
-
-    QMap<int, QList<DeviceInfo>> devices;
-
-    for(auto deviceInfo : deviceInfosMap[uid]) {
-        devices[deviceInfo.biotype].push_back(deviceInfo);
-    }
-    return devices;
-}
 
 QMap<int, QList<DeviceInfo>> BioDevices::getAllDevices()
 {
-    getDevicesList();
-
     QMap<int, QList<DeviceInfo>> devices;
 
     for(auto deviceInfo : deviceInfos) {
@@ -158,19 +105,67 @@ QMap<int, QList<DeviceInfo>> BioDevices::getAllDevices()
     return devices;
 }
 
-DeviceInfo* BioDevices::getDefaultDevice()
+QList<DeviceInfo> BioDevices::getDevices(int type)
 {
-    getDevicesList();
-    if(deviceInfos.size() > 0)
-        return deviceInfos[0];
+    QList<DeviceInfo> devices;
+
+    for(auto deviceInfo : deviceInfos) {
+        if (deviceInfo->biotype == type)
+            devices.push_back(*deviceInfo);
+    }
+
+    return devices;
+}
+
+DeviceInfo* BioDevices::getDefaultDevice(uid_t uid)
+{
+    if(deviceInfos.size() <= 0)
+        return nullptr;
+
+    QString defaultDeviceName;
+
+    struct passwd *pwd = getpwuid(uid);
+    QString userConfigFile = QString(pwd->pw_dir) + "/.config/ukui-biometric/biometric-auth.conf";
+    QSettings userConfig(userConfigFile, QSettings::IniFormat);
+    defaultDeviceName = userConfig.value(DEFAULT_DEVICE).toString();
+
+    if(defaultDeviceName.isEmpty() || !findDevice(defaultDeviceName)) {
+        QSettings sysConfig(GET_STR(CONFIG_FILE), QSettings::IniFormat);
+        defaultDeviceName = sysConfig.value(DEFAULT_DEVICE).toString();
+    }
+
+    qDebug() << "default device: " << defaultDeviceName;
+
+    if(defaultDeviceName.isEmpty())
+        return nullptr;
+
+    return findDevice(defaultDeviceName);
+}
+
+
+DeviceInfo* BioDevices::findDevice(const QString &deviceName)
+{
+    for(auto deviceInfo : deviceInfos) {
+        if(deviceInfo->device_shortname == deviceName)
+            return deviceInfo;
+    }
+    qDebug() << deviceName << "doesn't exists";
     return nullptr;
 }
 
-void BioDevices::clear()
+QString BioDevices::bioTypeToString_tr(int type)
 {
-//    isFirst = true;
-    for(int i = 0; i < deviceInfos.size(); i++)
-        delete(deviceInfos.at(i));
-    deviceInfos.clear();
-    deviceInfosMap.clear();
+    switch(type) {
+    case BIOTYPE_FINGERPRINT:
+        return tr("FingerPrint");
+    case BIOTYPE_FINGERVEIN:
+        return tr("FingerVein");
+    case BIOTYPE_IRIS:
+        return tr("Iris");
+    case BIOTYPE_FACE:
+        return tr("Face");
+    case BIOTYPE_VOICEPRINT:
+        return tr("VoicePrint");
+    }
+    return QString();
 }

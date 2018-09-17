@@ -25,17 +25,14 @@
 #define BIO_DBUS_PATH "/org/ukui/Biometric"
 #define BIO_DBUS_INTERFACE "org.ukui.Biometric"
 
-#define BIOMETRIC_PAM       "BIOMETRIC_PAM"
-#define BIOMETRIC_IGNORE    "BIOMETRIC_IGNORE"
-#define BIOMETRIC_SUCESS    "BIOMETRIC_SUCCESS"
+
+#define DEFAULT_DEVICE "DefaultDevice"
 
 
 #ifdef LOG
 #undef LOG
 #endif
 #define LOG() qDebug() << "[BIOMETRIC]"
-
-extern QStringList bioTypeStrings;
 
 /* the type of device */
 enum BioType {
@@ -94,6 +91,7 @@ Q_DECLARE_METATYPE(DeviceInfo)
 QDBusArgument &operator<<(QDBusArgument &argument, const DeviceInfo &deviceInfo);
 const QDBusArgument &operator>>(const QDBusArgument &argument, DeviceInfo &deviceInfo);
 
+QString bioTypeToString(int type);
 
 
 #endif // BIOCUSTOMTYPE_H

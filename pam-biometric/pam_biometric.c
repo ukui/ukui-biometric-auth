@@ -111,13 +111,14 @@ int call_conversation(pam_handle_t *pamh, int msg_style, char *msg, char *resp)
 /* GUI child process */
 void child(char *service, char *username, char *xdisp)
 {
-    char *gui = "/bin/bash /bin/ukui-pam-biometric-dialog";
+    char *gui = "/bin/ukui-pam-biometric-dialog";
     logger("Child process will be replaced.\n");
-    execl(gui, "ukui-pam-biometric-gui",
-    	"--service", service,
-    	"--username", username,
-    	"--display", xdisp,
-    	(char *)0);
+    execl(gui, "ukui-pam-biometric-dialog",
+          "--service", service,
+          "--username", username,
+          "--display", xdisp,
+          enable_debug ? "--debug" : "",
+          (char *)0);
     /*
      * execl almost always succeed as long as the GUI executable file exists.
      * Though invoking GUI under console will exit with error, the GUI child
@@ -300,14 +301,16 @@ int biometric_auth_embeded(pam_handle_t *pamh)
      * status by comparing strings.
      */
     char resp[96] = {0};
-    call_conversation(pamh, PAM_PROMPT_ECHO_OFF, "BIOMETRIC_PAM",
-                                                            resp);
-    if (strcmp(resp, "BIOMETRIC_IGNORE") == 0)
-            return PAM_IGNORE;
-    else if (strcmp(resp, "BIOMETRIC_SUCCESS") == 0)
-            return PAM_SUCCESS;
+    call_conversation(pamh, PAM_PROMPT_ECHO_OFF, BIOMETRIC_PAM, resp);
+
+    if (strcmp(resp, BIOMETRIC_IGNORE) == 0)
+        return PAM_IGNORE;
+    else if (strcmp(resp, BIOMETRIC_SUCCESS) == 0)
+        return PAM_SUCCESS;
+    else if (strcmp(resp, BIOMETRIC_FAILED) == 0)
+        return PAM_AUTH_ERR;
     else
-            return PAM_SYSTEM_ERR;
+        return PAM_SYSTEM_ERR;
 }
 
 void get_greeter_session(char buf[], int len)

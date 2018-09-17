@@ -31,6 +31,35 @@
     </message>
 </context>
 <context>
+    <name>BioDevices</name>
+    <message>
+        <location filename="../src/biodevices.cpp" line="161"/>
+        <location filename="../src/biodevices.cpp" line="163"/>
+        <source>FingerPrint</source>
+        <translation>指纹</translation>
+    </message>
+    <message>
+        <location filename="../src/biodevices.cpp" line="165"/>
+        <source>FingerVein</source>
+        <translation>指静脉</translation>
+    </message>
+    <message>
+        <location filename="../src/biodevices.cpp" line="167"/>
+        <source>Iris</source>
+        <translation>虹膜</translation>
+    </message>
+    <message>
+        <location filename="../src/biodevices.cpp" line="169"/>
+        <source>Face</source>
+        <translation>人脸</translation>
+    </message>
+    <message>
+        <location filename="../src/biodevices.cpp" line="171"/>
+        <source>VoicePrint</source>
+        <translation>声纹</translation>
+    </message>
+</context>
+<context>
     <name>BioDevicesWidget</name>
     <message>
         <location filename="../src/biodeviceswidget.ui" line="14"/>
@@ -52,33 +81,33 @@
         <source>OK</source>
         <translation>确定</translation>
     </message>
+    <message>
+        <location filename="../src/biodeviceswidget.cpp" line="45"/>
+        <source>FingerPrint</source>
+        <translation>指纹</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/biotypes.cpp" line="4"/>
         <source>FingerPrint</source>
-        <translation>指纹</translation>
+        <translation type="vanished">指纹</translation>
     </message>
     <message>
-        <location filename="../src/biotypes.cpp" line="5"/>
         <source>FingerVein</source>
-        <translation>指静脉</translation>
+        <translation type="vanished">指静脉</translation>
     </message>
     <message>
-        <location filename="../src/biotypes.cpp" line="6"/>
         <source>Iris</source>
-        <translation>虹膜</translation>
+        <translation type="vanished">虹膜</translation>
     </message>
     <message>
-        <location filename="../src/biotypes.cpp" line="7"/>
         <source>Face</source>
-        <translation>人脸</translation>
+        <translation type="vanished">人脸</translation>
     </message>
     <message>
-        <location filename="../src/biotypes.cpp" line="8"/>
         <source>VoicePrint</source>
-        <translation>声纹</translation>
+        <translation type="vanished">声纹</translation>
     </message>
 </context>
 </TS>

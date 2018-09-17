@@ -30,9 +30,12 @@ INCLUDEPATH += $$PWD/../bioAuthentication/include/ \
                 $$PWD/../common/
 LIBS += -L$$PWD/../bioAuthentication -lbioAuthentication
 
+VPATH += $$PWD/../common/
+
 SOURCES += \
         src/main.cpp \
-        src/mainwindow.cpp
+        src/mainwindow.cpp \
+        generic.cpp
 
 HEADERS += \
         src/mainwindow.h

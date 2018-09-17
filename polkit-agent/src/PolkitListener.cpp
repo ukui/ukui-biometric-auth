@@ -30,7 +30,6 @@
 
 #include <fcntl.h>
 
-#include "Globals.h"
 #include "PolkitListener.h"
 #include "mainwindow.h"
 #include "generic.h"

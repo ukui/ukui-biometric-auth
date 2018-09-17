@@ -18,12 +18,37 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QTranslator>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
+
 #include "generic.h"
+
+bool enableDebug;
+QString logPrefix;
 
 int main(int argc, char *argv[])
 {
     QApplication::setSetuidAllowed(true);
     QApplication a(argc, argv);
+
+    QCommandLineParser parser;
+
+    QCommandLineOption serviceOption({"s", "service"}, QObject::tr("Sevice Name"));
+    QCommandLineOption displayOption({"x", "display"}, QObject::tr("DISPLAY env"), "display", ":0");
+    QCommandLineOption usernameOption({"u", "username"}, QObject::tr("User Name"), "username", "");
+    QCommandLineOption debugOption({"d", "debug"}, QObject::tr("Display debug infomation"));
+
+    parser.addOptions({serviceOption, displayOption, usernameOption, debugOption});
+    parser.process(a);
+
+    if(parser.isSet(debugOption))
+        enableDebug = true;
+    else
+        enableDebug = false;
+
+    logPrefix = "[pam-diaglog]:";
+    qInstallMessageHandler(outputMessage);
+
 
     QString locale = QLocale::system().name();
     QTranslator translator;
@@ -32,7 +57,12 @@ int main(int argc, char *argv[])
     translator.load(qmfile);
     a.installTranslator(&translator);
 
-    MainWindow w;
+    QString userName = parser.value(usernameOption);
+    if(userName.isEmpty())
+        exit(EXIT_FAILURE);
+    qDebug() << "authentication user: " << userName;
+
+    MainWindow w(userName);
     w.show();
 
     return a.exec();

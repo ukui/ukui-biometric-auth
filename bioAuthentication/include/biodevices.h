@@ -36,41 +36,17 @@ class BioDevices : public QObject
 public:
     explicit BioDevices(QObject *parent = nullptr);
 
-    /*!
-     * \brief the count of available devices
-     */
     int count();
-
-    /*!
-     * \brief the feature's count of the given user
-     * \param uid the given user's uid
-     * \return
-     */
-    int getDevicesCount(qint32 uid);
-
-    int getDevicesCount();
-
-    /*!
-     * \brief the list of device's info that the given
-     *        user has features
-     * \param uid   the given user's uid
-     * \return
-     */
-    QMap<int, QList<DeviceInfo>> getDevicesList(uid_t uid);
-
     QMap<int, QList<DeviceInfo>> getAllDevices();
+    QList<DeviceInfo> getDevices(int type);
+    DeviceInfo* getDefaultDevice(uid_t uid);
+    DeviceInfo* findDevice(const QString &deviceName);
 
-    DeviceInfo* getDefaultDevice();
-
-    /*!
-     * \brief clear the list of device
-     */
-    void clear();
+    static QString bioTypeToString_tr(int type);
 
 private:
     void connectToService();
     void getDevicesList();
-    void getFeaturesList(qint32 uid);
 
 signals:
     void deviceCountChanged(int newNum);
@@ -80,9 +56,7 @@ private slots:
 
 private:
     QDBusInterface                  *serviceInterface;
-
     QList<DeviceInfo*>               deviceInfos;        //the list of al device info
-    QMap<int, QList<DeviceInfo>>     deviceInfosMap;   //[uid, avaliable DeviceInfos]
 };
 
 

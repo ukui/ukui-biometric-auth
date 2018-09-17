@@ -4,7 +4,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/mainwindow.cpp" line="22"/>
+        <location filename="../src/mainwindow.cpp" line="39"/>
         <source>Authentication</source>
         <translation>授权</translation>
     </message>
@@ -39,7 +39,7 @@
         <translation type="vanished">返回</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="179"/>
+        <location filename="../src/mainwindow.ui" line="182"/>
         <source>Details</source>
         <translation>详细</translation>
     </message>
@@ -48,12 +48,12 @@
         <translation type="vanished">动作:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="294"/>
+        <location filename="../src/mainwindow.ui" line="320"/>
         <source>Description:</source>
         <translation>描述：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="230"/>
+        <location filename="../src/mainwindow.ui" line="239"/>
         <source>Polkit.subject-pid:</source>
         <translation>Polkit.subject-pid：</translation>
     </message>
@@ -66,27 +66,27 @@
         <translation type="vanished">设备类型：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="247"/>
+        <location filename="../src/mainwindow.ui" line="262"/>
         <source>Vendor:</source>
         <translation>发行商：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="263"/>
+        <location filename="../src/mainwindow.ui" line="353"/>
         <source>Action:</source>
         <translation>动作：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="304"/>
+        <location filename="../src/mainwindow.ui" line="330"/>
         <source>Polkit.caller-pid:</source>
         <translation>Polkit.caller-pid：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="344"/>
+        <location filename="../src/mainwindow.ui" line="392"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="351"/>
+        <location filename="../src/mainwindow.ui" line="405"/>
         <source>Authenticate</source>
         <translation>授权</translation>
     </message>
@@ -95,17 +95,17 @@
         <translation type="vanished">授权</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="133"/>
+        <location filename="../src/mainwindow.cpp" line="150"/>
         <source>in authentication, please wait...</source>
         <translation>认证中，请稍等...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="166"/>
+        <location filename="../src/mainwindow.cpp" line="183"/>
         <source>An application is attempting to perform an action that requires privileges. Authentication is required to perform this action.</source>
         <translation>一个程序正试图执行一个需要特权的动作。要求授权以执行该动作。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="213"/>
+        <location filename="../src/mainwindow.cpp" line="230"/>
         <source>Authentication failed, please try again.</source>
         <translation>认证失败，请重试。</translation>
     </message>
@@ -117,12 +117,12 @@
 <context>
     <name>PolkitListener</name>
     <message>
-        <location filename="../src/PolkitListener.cpp" line="43"/>
+        <location filename="../src/PolkitListener.cpp" line="58"/>
         <source>Another client is already authenticating, please try again later.</source>
         <translation>有另外一个客户端正在认证，请稍后重试。</translation>
     </message>
     <message>
-        <location filename="../src/PolkitListener.cpp" line="155"/>
+        <location filename="../src/PolkitListener.cpp" line="170"/>
         <source>Authentication failure, please try again.</source>
         <translation>认证失败，请重试。</translation>
     </message>

@@ -18,6 +18,8 @@ DEFINES += INSTALL_PATH=$${PREFIX} \
 INCLUDEPATH +=  $$PWD/../common/ \
                 $$PWD/../bioAuthentication/include/
 
+VPATH += $$PWD/../common/
+
 LIBS +=  -lpolkit-qt5-core-1 \
         -L$$PWD/../bioAuthentication -lbioAuthentication
 
@@ -25,9 +27,7 @@ LIBS +=  -lpolkit-qt5-core-1 \
 PKGCONFIG += polkit-qt5-agent-1
 
 HEADERS += \
-    src/Globals.h \
     src/mainwindow.h \
-    src/Globals.h \
     src/PolkitListener.h
 
 FORMS += \
@@ -36,7 +36,8 @@ FORMS += \
 SOURCES += \
     src/PolkitAgent.cpp \
     src/mainwindow.cpp \
-    src/PolkitListener.cpp
+    src/PolkitListener.cpp \
+    generic.cpp
 
 RESOURCES += \
     assets.qrc
@@ -46,6 +47,8 @@ DISTFILES += \
 
 
 TRANSLATIONS += i18n_ts/zh_CN.ts
+
+system(lrelease i18n_ts/*.ts)
 
 qm_file.files = i18n_ts/*.qm
 qm_file.path = ${DESTDIR_POLKIT}$${PREFIX}/i18n_qm/

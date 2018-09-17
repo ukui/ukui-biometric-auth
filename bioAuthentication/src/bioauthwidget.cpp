@@ -26,6 +26,8 @@ BioAuthWidget::BioAuthWidget(QWidget *parent) :
     bioAuth(nullptr)
 {
     ui->setupUi(this);
+    ui->btnRetry->setVisible(false);
+    ui->btnMore->setVisible(false);
 }
 
 BioAuthWidget::~BioAuthWidget()
@@ -68,7 +70,7 @@ void BioAuthWidget::onBioAuthComplete(uid_t uid, bool ret)
 
 void BioAuthWidget::setMovie()
 {
-    QString typeString = bioTypeStrings.at(device.biotype);
+    QString typeString = bioTypeToString(device.biotype);
     QString moviePath = QString("%1/images/%2.gif").arg(GET_STR(UKUI_BIOMETRIC)).arg(typeString);
     QMovie *movie = new QMovie(moviePath);
     movie->setScaledSize(QSize(ui->lblBioImage->width(), ui->lblBioImage->height()));
@@ -76,17 +78,21 @@ void BioAuthWidget::setMovie()
     ui->lblBioImage->setMovie(movie);
     movie->start();
 
+    ui->btnRetry->setVisible(false);
+
     qDebug() << "set movie " << moviePath;
 }
 
 void BioAuthWidget::setImage()
 {
-    QString typeString = bioTypeStrings.at(device.biotype);
-    QString pixmapPath = QString("%1/images/%2.png").arg(GET_STR(UKI_BIOMETRIC)).arg(typeString);
+    QString typeString = bioTypeToString(device.biotype);
+    QString pixmapPath = QString("%1/images/%2.png").arg(GET_STR(UKUI_BIOMETRIC)).arg(typeString);
     QPixmap pixmap(pixmapPath);
     pixmap = pixmap.scaled(ui->lblBioImage->width(), ui->lblBioImage->height(),
                            Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     ui->lblBioImage->setPixmap(pixmap);
+
+    ui->btnRetry->setVisible(true);
 
     qDebug() << "set pixmap " << typeString;
 }

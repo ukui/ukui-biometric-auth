@@ -8,7 +8,8 @@ CONFIG += staticlib debug c++11
 
 DESTDIR = $$PWD/
 
-DEFINES += UKUI_BIOMETRIC=${UKUI_BIOMETRIC}
+DEFINES += UKUI_BIOMETRIC=${UKUI_BIOMETRIC} \
+            CONFIG_FILE=${UKUI_BIOMETRIC}/biometric-auth.conf
 
 INCLUDEPATH += $$PWD/include/ \
                $$PWD/../common/
@@ -33,6 +34,8 @@ FORMS += \
     src/biodeviceswidget.ui
 
 TRANSLATIONS += i18n_ts/zh_CN.ts
+
+system(lrelease i18n_ts/*.ts)
 
 qm_file.files = i18n_ts/*.qm
 qm_file.path = ${DESTDIR_PAM}${UKUI_BIOMETRIC}/i18n_qm/

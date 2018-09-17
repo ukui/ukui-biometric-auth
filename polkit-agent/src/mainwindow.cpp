@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 
-#include "Globals.h"
+#include "generic.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
@@ -64,14 +64,14 @@ MainWindow::MainWindow(QWidget *parent) :
             this, [&](uid_t uid, bool ret){
         qDebug() << "biometric authentication complete: " << uid << ret;
         if(uid == getUid(userName) && ret)
-            accept(BIOMETRIC_SUCESS);
-        else
-            accept(BIOMETRIC_FAILED);
+            accept(BIOMETRIC_SUCCESS);
+//        else
+//            accept(BIOMETRIC_FAILED);
     });
 
     connect(widgetBioAuth, &BioAuthWidget::selectDevice,
             this, [&]{
-        widgetBioDevices->init();
+        widgetBioDevices->init(getUid(userName));
         switchWidget(DEVICES);
     });
 
@@ -244,7 +244,7 @@ void MainWindow::clearEdit()
 
 void MainWindow::switchAuthMode(Mode mode)
 {
-    enableBioAuth  = bioDevices.getDevicesCount() > 0;
+    enableBioAuth  = bioDevices.count() > 0;
 
     switch(mode){
     case PASSWORD:
@@ -273,7 +273,7 @@ void MainWindow::switchAuthMode(Mode mode)
 
         if(enableBioAuth) {
             qDebug() << "enable biometric authenticaion";
-            DeviceInfo *device = bioDevices.getDefaultDevice();
+            DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
             widgetBioAuth->startAuth(getUid(userName), *device);
             widgetBioAuth->setMoreDevices(bioDevices.count() > 1);
         } else {
@@ -308,8 +308,6 @@ uid_t MainWindow::getUid(const QString &userName)
 
 void MainWindow::switchWidget(Mode mode)
 {
-    qDebug() << mode;
-
     ui->widgetPasswdAuth->hide();
     ui->btnAuth->hide();
     widgetBioAuth->hide();
@@ -317,7 +315,7 @@ void MainWindow::switchWidget(Mode mode)
 
     switch(mode){
     case PASSWORD:
-//        setMinimumWidth(420);
+        setMinimumWidth(420);
         ui->widgetPasswdAuth->show();
         ui->lePassword->setFocus();
         ui->btnAuth->show();
