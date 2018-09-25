@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -fPIC
+CFLAGS = -g -Wall -fPIC
 INCLUDE = -I../common
 PAM_LDFLAGS = -lpam
 PAM_MODULE_DIR = /lib/security
@@ -8,11 +8,11 @@ OBJS = pam_biometric.o logger.o
 UKUI_BIOMETRIC=/usr/share/ukui-biometric
 CONFIG_FILE=$(UKUI_BIOMETRIC)/biometric-auth.conf
 POLKIT_ACTION_DIR=/usr/share/polkit-1/actions
-ifeq ($(mode), debug)
-	CFLAGS += -g
-else
-	CFLAGS += -O2
-endif
+#ifeq ($(mode), debug)
+#	CFLAGS += -g
+#else
+#	CFLAGS += -O2
+#endif
 
 all: pam_biometric.so
 
