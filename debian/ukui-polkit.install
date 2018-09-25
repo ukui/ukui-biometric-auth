@@ -1,0 +1,5 @@
+/etc/xdg/*
+/usr/lib/*
+/usr/share/ukui-biometric/images/*
+/usr/share/ukui-biometric/ukui-polkit-agent/*
+/usr/share/polkit-1/*
