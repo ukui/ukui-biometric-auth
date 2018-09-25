@@ -153,6 +153,14 @@ DeviceInfo* BioDevices::findDevice(const QString &deviceName)
     return nullptr;
 }
 
+DeviceInfo* BioDevices::getFirstDevice()
+{
+    if(!deviceInfos.isEmpty())
+        return deviceInfos.at(0);
+
+    return nullptr;
+}
+
 QString BioDevices::bioTypeToString_tr(int type)
 {
     switch(type) {

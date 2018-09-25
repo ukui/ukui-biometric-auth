@@ -40,7 +40,7 @@
 #define POLKIT_LISTENER_ID "/org/ukui/PolicyKit1/AuthenticationAgent"
 
 
-#ifdef QT_CORE_LIB
+#ifdef __cplusplus
 
 #include "qlogging.h"
 

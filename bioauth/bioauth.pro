@@ -8,8 +8,7 @@ CONFIG += staticlib debug c++11
 
 DESTDIR = $$PWD/
 
-DEFINES += UKUI_BIOMETRIC=${UKUI_BIOMETRIC} \
-            CONFIG_FILE=${UKUI_BIOMETRIC}/biometric-auth.conf
+include(bioauth.pri)
 
 INCLUDEPATH += $$PWD/include/ \
                $$PWD/../common/

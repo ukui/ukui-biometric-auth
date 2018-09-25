@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-        bioAuthentication \
+        bioauth \
         pam-biometric \
         pam-biometric-dialog \
         polkit-agent

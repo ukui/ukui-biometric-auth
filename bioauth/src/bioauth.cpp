@@ -39,8 +39,16 @@ BioAuth::~BioAuth()
     stopAuth();
 }
 
+void BioAuth::setDevice(const DeviceInfo &deviceInfo)
+{
+    this->deviceInfo = deviceInfo;
+}
+
 void BioAuth::startAuth()
 {
+    if(isInAuthentication)
+        stopAuth();
+
     /* 开始认证识别 */
     LOG() << "start biometric verification";
     QList<QVariant> args;
@@ -87,13 +95,14 @@ void BioAuth::onIdentityComplete(QDBusPendingCallWatcher *watcher)
 
     /* 识别生物特征成功，发送认证结果 */
     if(isInAuthentication){
+
+        isInAuthentication = false;
+
         if(result == DBUS_RESULT_SUCCESS && retUid == uid)
             Q_EMIT authComplete(retUid, true);
         else
             Q_EMIT authComplete(retUid, false);
     }
-
-    isInAuthentication = false;
 }
 
 

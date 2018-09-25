@@ -23,19 +23,22 @@ $(OBJS): %.o: %.c
 	$(CC) $(CFLAGS) -DUKUI_BIOMETRIC=$(UKUI_BIOMETRIC) -DCONFIG_FILE=$(CONFIG_FILE) -c -o $@ $< $(INCLUDE)
 
 install:
-	install -D pam_biometric.so $(DESTDIR_PAM)$(PAM_MODULE_DIR)/pam_biometric.so
-	install -m 644 -D pam-configs/pam-biometric $(DESTDIR_PAM)$(PAM_CONFIGS)/pam-biometric
-	install -m 644 -D data/biometric-auth.conf $(DESTDIR_PAM)$(UKUI_BIOMETRIC)/biometric-auth.conf
+	install -D pam_biometric.so $(INSTALL_ROOT)$(PAM_MODULE_DIR)/pam_biometric.so
+	install -m 644 -D pam-configs/pam-biometric $(INSTALL_ROOT)$(PAM_CONFIGS)/pam-biometric
+	install -m 644 -D data/biometric-auth.conf $(INSTALL_ROOT)$(UKUI_BIOMETRIC)/biometric-auth.conf
 	install -m 644 -D data/org.freedesktop.plicykit.pkexec.bioctl.policy \
-		$(DESTDIR_PAM)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.bioctl.policy
-	install -m 755 -D utils/bioctl $(DESTDIR_PAM)/bin/bioctl
+		$(INSTALL_ROOT)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.bioctl.policy
+	install -m 755 -D utils/bioctl $(INSTALL_ROOT)/bin/bioctl
 
 uninstall:
-	rm -f $(DESTDIR_PAM)$(PAM_MODULE_DIR)/pam_biometric.so
-	rm -f $(DESTDIR_PAM)$(PAM_CONFIGS)/pam-biometric
-	rm -f $(DESTDIR_PAM)$(UKUI_BIOMETRIC)/biometric-auth.conf
-	rm -f $(DESTDIR_PAM)/bin/bioctl
-	rm -f $(DESTDIR_PAM)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.bioctl.policy
+	rm -f $(INSTALL_ROOT)$(PAM_MODULE_DIR)/pam_biometric.so
+	rm -f $(INSTALL_ROOT)$(PAM_CONFIGS)/pam-biometric
+	rm -f $(INSTALL_ROOT)$(UKUI_BIOMETRIC)/biometric-auth.conf
+	rm -f $(INSTALL_ROOT)/bin/bioctl
+	rm -f $(INSTALL_ROOT)$(POLKIT_ACTION_DIR)/org.freedesktop.plicykit.pkexec.bioctl.policy
 
 clean:
-	rm -f *.o pam_biometric.so
+	rm -f *.o
+distclean:
+	rm -f *.o
+	rm -f pam_biometric.so

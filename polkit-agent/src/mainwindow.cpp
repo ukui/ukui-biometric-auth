@@ -33,7 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
     enableBioAuth(false),
-    receiveBioPAM(false)
+    receiveBioPAM(false),
+    authMode(UNDEFINED)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Authentication"));
@@ -212,7 +213,12 @@ void MainWindow::setDetails(const QString &subPid, const QString &callerPid, con
 
 void MainWindow::setPrompt(const QString &text, bool echo)
 {
-    ui->lblPrompt->setText(text);
+    QString prompt = text;
+
+    if(text == "Password: ")
+        prompt = tr("Password: ");
+
+    ui->lblPrompt->setText(prompt);
     ui->lePassword->setEchoMode(echo ? QLineEdit::Normal : QLineEdit::Password);
     switchWidget(PASSWORD);
 }
@@ -267,20 +273,37 @@ void MainWindow::switchAuthMode(Mode mode)
         if(authMode == PASSWORD) {
             emit accept(BIOMETRIC_IGNORE);
             break;
-        }
-
-        authMode = mode;
-
-        if(enableBioAuth) {
-            qDebug() << "enable biometric authenticaion";
+        } else if(authMode == BIOMETRIC) {
             DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
-            widgetBioAuth->startAuth(getUid(userName), *device);
-            widgetBioAuth->setMoreDevices(bioDevices.count() > 1);
-        } else {
-            /* pass biometric's pam module if there are not available devices */
-            qDebug() << "It doesn't meet the condition for enabling biometric authentication, switch to password.";
-            emit accept(BIOMETRIC_IGNORE);
-            switchAuthMode(PASSWORD);
+            if(!device)
+                device = bioDevices.getFirstDevice();
+            if(device) {
+                widgetBioAuth->startAuth(getUid(userName), *device);
+                widgetBioAuth->setMoreDevices(bioDevices.count() > 1);
+            }
+            authMode = BIOMETRIC;
+        } else if(authMode == UNDEFINED){
+
+            authMode = BIOMETRIC;
+
+            if(enableBioAuth) {
+                qDebug() << "enable biometric authenticaion";
+                DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+                if(device) {
+                    widgetBioAuth->startAuth(getUid(userName), *device);
+                    widgetBioAuth->setMoreDevices(bioDevices.count() > 1);
+                } else {
+                    qDebug() << "No default device, switch to password";
+                    emit accept(BIOMETRIC_IGNORE);
+                    switchAuthMode(PASSWORD);
+                }
+
+            } else {
+                /* pass biometric's pam module if there are not available devices */
+                qDebug() << "It doesn't meet the condition for enabling biometric authentication, switch to password.";
+                emit accept(BIOMETRIC_IGNORE);
+                switchAuthMode(PASSWORD);
+            }
         }
     }
         break;

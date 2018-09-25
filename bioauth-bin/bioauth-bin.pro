@@ -3,11 +3,10 @@
 # Project created by QtCreator 2018-09-03T15:02:45
 #
 #-------------------------------------------------
-QT  += core gui dbus
+QT  += core dbus
+QT -= gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = ukui-pam-biometric-dialog
+TARGET = bioauth
 TEMPLATE = app
 
 CONFIG += debug c++11
@@ -26,26 +25,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 DEFINES += UKUI_BIOMETRIC=${UKUI_BIOMETRIC}
 
-INCLUDEPATH += $$PWD/../bioAuthentication/include/ \
-                $$PWD/../common/
-LIBS += -L$$PWD/../bioAuthentication -lbioAuthentication
+include($$PWD/../bioauth/bioauth.pri)
 
-VPATH += $$PWD/../common/
+INCLUDEPATH += $$PWD/../common/ \
+                $$PWD/../bioauth/include/
+
+VPATH += $$PWD/../common/ \
 
 SOURCES += \
         src/main.cpp \
-        src/mainwindow.cpp \
-        generic.cpp
+        src/keywatcher.cpp \
+        generic.cpp \
 
 HEADERS += \
-        src/mainwindow.h
+        src/keywatcher.h
 
-FORMS += \
-        src/mainwindow.ui
+TRANSLATIONS += i18n_ts/zh_CN.ts
 
-RESOURCES += \
-    assets.qrc
+system(lrelease i18n_ts/*.ts)
 
-target.path = ${DESTDIR_PAM}/bin/
+qm_file.files = i18n_ts/*.qm
+qm_file.path = /${UKUI_BIOMETRIC}/bioauth-bin/i18n_qm/
 
-INSTALLS += target
+target.path = /bin/
+
+INSTALLS += target qm_file

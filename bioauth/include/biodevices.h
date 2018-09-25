@@ -41,6 +41,7 @@ public:
     QList<DeviceInfo> getDevices(int type);
     DeviceInfo* getDefaultDevice(uid_t uid);
     DeviceInfo* findDevice(const QString &deviceName);
+    DeviceInfo* getFirstDevice();
 
     static QString bioTypeToString_tr(int type);
 

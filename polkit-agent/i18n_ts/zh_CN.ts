@@ -4,7 +4,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/mainwindow.cpp" line="39"/>
+        <location filename="../src/mainwindow.cpp" line="40"/>
         <source>Authentication</source>
         <translation>授权</translation>
     </message>
@@ -26,7 +26,7 @@
         <translation type="vanished">密码</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="147"/>
+        <location filename="../src/mainwindow.ui" line="153"/>
         <source>Biometric</source>
         <translation>使用生物识别</translation>
     </message>
@@ -39,7 +39,7 @@
         <translation type="vanished">返回</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="182"/>
+        <location filename="../src/mainwindow.ui" line="188"/>
         <source>Details</source>
         <translation>详细</translation>
     </message>
@@ -48,12 +48,12 @@
         <translation type="vanished">动作:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="320"/>
+        <location filename="../src/mainwindow.ui" line="326"/>
         <source>Description:</source>
         <translation>描述：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="239"/>
+        <location filename="../src/mainwindow.ui" line="245"/>
         <source>Polkit.subject-pid:</source>
         <translation>Polkit.subject-pid：</translation>
     </message>
@@ -66,27 +66,27 @@
         <translation type="vanished">设备类型：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="262"/>
+        <location filename="../src/mainwindow.ui" line="268"/>
         <source>Vendor:</source>
         <translation>发行商：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="353"/>
+        <location filename="../src/mainwindow.ui" line="359"/>
         <source>Action:</source>
         <translation>动作：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="330"/>
+        <location filename="../src/mainwindow.ui" line="336"/>
         <source>Polkit.caller-pid:</source>
         <translation>Polkit.caller-pid：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="392"/>
+        <location filename="../src/mainwindow.ui" line="398"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="405"/>
+        <location filename="../src/mainwindow.ui" line="411"/>
         <source>Authenticate</source>
         <translation>授权</translation>
     </message>
@@ -95,17 +95,30 @@
         <translation type="vanished">授权</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="150"/>
+        <location filename="../src/mainwindow.cpp" line="151"/>
         <source>in authentication, please wait...</source>
         <translation>认证中，请稍等...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="183"/>
+        <location filename="../src/mainwindow.cpp" line="184"/>
         <source>An application is attempting to perform an action that requires privileges. Authentication is required to perform this action.</source>
         <translation>一个程序正试图执行一个需要特权的动作。要求授权以执行该动作。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="230"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
+        <source>Password: </source>
+        <translation type="unfinished">密码： </translation>
+    </message>
+    <message>
+        <source>_Password: </source>
+        <translation type="obsolete">密码： </translation>
+    </message>
+    <message>
+        <source>_Password:</source>
+        <translation type="vanished">密码：</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="236"/>
         <source>Authentication failed, please try again.</source>
         <translation>认证失败，请重试。</translation>
     </message>

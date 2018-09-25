@@ -61,8 +61,8 @@ int service_filter(char *service)
     	return 1;
     if (strcmp(service, "su") == 0)
     	return 1;
-    if (strcmp(service, "mate-screensaver") == 0)
-    	return 1;
+//    if (strcmp(service, "mate-screensaver") == 0)
+//    	return 1;
     if (strcmp(service, "polkit-1") == 0)
     	return 1;
 #ifdef ENABLE_BIOTEST
@@ -111,11 +111,14 @@ int call_conversation(pam_handle_t *pamh, int msg_style, char *msg, char *resp)
 /* GUI child process */
 void child(char *service, char *username, char *xdisp)
 {
-    char *gui = "/bin/ukui-pam-biometric-dialog";
+    char *gui = "/bin/bioauth";
     logger("Child process will be replaced.\n");
-    execl(gui, "ukui-pam-biometric-dialog",
+    int fd = open("/dev/null", O_WRONLY);
+    dup2(fd, 2);
+
+    execl(gui, "bioauth",
           "--service", service,
-          "--username", username,
+          "--user", username,
           "--display", xdisp,
           enable_debug ? "--debug" : "",
           (char *)0);
@@ -387,7 +390,6 @@ int enable_biometric_authentication()
 int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
         const char **argv)
 {
-
     for(int i = 0; i < argc; i++) {
         if(strcmp(argv[i], "debug") == 0) {
             enable_debug = 1;
@@ -423,8 +425,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
 
         if(strcmp(buf, "ukui-greeter") == 0)
             return biometric_auth_embeded(pamh);
-        else
-            return biometric_auth_independent(pamh, "lightdm", 1);
+//        else
+//            return biometric_auth_independent(pamh, "lightdm", 1);
     }
     else if (strcmp(service, "ukui-screensaver-qt")==0)
         return biometric_auth_embeded(pamh);
@@ -438,8 +440,8 @@ int pam_sm_authenticate(pam_handle_t *pamh, int flags, int argc,
         return biometric_auth_independent(pamh, "sudo", 0);
     else if (strcmp(service, "su") == 0)
         return biometric_auth_independent(pamh, "su", 0);
-    else if (strcmp(service, "mate-screensaver") == 0)
-        return biometric_auth_independent(pamh, "mate-screensaver", 1);
+//    else if (strcmp(service, "mate-screensaver") == 0)
+//        return biometric_auth_independent(pamh, "mate-screensaver", 1);
     #ifdef ENABLE_BIOTEST
     else if (strcmp(service, "biotest") == 0)
         return biometric_auth_independent(pamh, "biotest", 1);

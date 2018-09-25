@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/qss">
-        <file>src/pam_gui.qss</file>
-    </qresource>
-</RCC>

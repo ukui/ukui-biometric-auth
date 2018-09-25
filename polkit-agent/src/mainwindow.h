@@ -80,6 +80,7 @@ private:
     Mode authMode;
     BioDevicesWidget *widgetBioDevices;
     BioAuthWidget *widgetBioAuth;
+    bool isFirst;
 };
 
 #endif // MAINWINDOW_H

@@ -34,6 +34,7 @@ class BioAuth : public QObject
 public:
     explicit BioAuth(qint32 uid, const DeviceInfo &deviceInfo, QObject *parent = nullptr);
     ~BioAuth();
+    void setDevice(const DeviceInfo& deviceInfo);
     void startAuth();
     void stopAuth();
     bool isAuthenticating();
