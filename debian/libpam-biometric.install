@@ -1,5 +1,8 @@
 /etc/biometric-auth/ukui-biometric.conf
-/bin/*
 /lib/security/*
-/usr/share/ukui-biometric/bioauth-bin/*
+/usr/bin/*
 /usr/share/pam-configs/*
+/usr/share/polkit-1/actions/*.policy
+/usr/share/ukui-biometric/images/
+/usr/share/ukui-biometric/i18n_qm/*.qm
+/usr/share/ukui-biometric/i18n_qm/bioauth-bin/*.qm
