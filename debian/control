@@ -8,9 +8,9 @@ Build-Depends: debhelper (>= 11),
                qtbase5-dev,
                libpam-dev,
                libpolkit-qt5-1-dev,
-			   qttools5-dev,
+               qttools5-dev,
                qttools5-dev-tools,
-			   pkg-config
+               pkg-config
 Standards-Version: 4.2.1
 Homepage: http://www.ukui.org
 Vcs-Git: https://salsa.debian.org/kylin-team/ukui-biometric-auth.git
@@ -18,8 +18,7 @@ Vcs-Browser: https://salsa.debian.org/kylin-team/ukui-biometric-auth
 
 Package: libpam-biometric
 Architecture: any
-Depends: ${shlibs:Depends},
-         ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: biometric-auth
 Description: Insertable authentication module for PAM
  The indispensable part for biometric authentication in
