@@ -1,0 +1,41 @@
+#!/bin/bash
+
+export TEXTDOMAINDIR=/usr/share/locale
+export TEXTDOMAIN=biodrvctl
+
+. gettext.sh
+
+function usage()
+{
+	echo -e "Usage:"
+	echo -e "  biodrvctl "$(gettext "COMMAND DRIVER-NAME")
+	echo
+	echo -e "Build-in command:"
+	echo -e "  enable\t"$(gettext "Enable device's driver")
+	echo -e "  disable\t"$(gettext "Disable device's driver")
+}
+
+if [ $# -ne 2 ]; then
+	usage
+	exit 1
+fi
+
+if [ `whoami` != 'root' ]; then
+	echo $(gettext "Permission denied, please run by root")
+	exit 1
+fi
+
+if [ "$1" == "enable" ]; then
+	biometric-config-tool enable-driver $2
+elif [ "$1" == "disable" ]; then
+	biometric-config-tool disable-driver $2
+else
+	usage
+	exit 1
+fi
+
+if [ $? -eq 0 ]; then
+	systemctl restart biometric-authentication.service
+fi
+
+exit $?

@@ -125,9 +125,11 @@ DeviceInfo* BioDevices::getDefaultDevice(uid_t uid)
     QString defaultDeviceName;
 
     struct passwd *pwd = getpwuid(uid);
-    QString userConfigFile = QString(pwd->pw_dir) + "/.config/ukui-biometric/biometric-auth.conf";
+    QString userConfigFile = QString(pwd->pw_dir) + "/.biometric_auth/ukui_biometric.conf";
     QSettings userConfig(userConfigFile, QSettings::IniFormat);
+	qDebug() << userConfig.fileName();
     defaultDeviceName = userConfig.value(DEFAULT_DEVICE).toString();
+	qDebug() << defaultDeviceName;
 
     if(defaultDeviceName.isEmpty() || !findDevice(defaultDeviceName)) {
         QSettings sysConfig(GET_STR(CONFIG_FILE), QSettings::IniFormat);

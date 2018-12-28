@@ -31,8 +31,8 @@
 #define START_COLOR     "\033[1;31m"
 #define RESULT_COLOR    "\033[1;31m"
 #define PROMPT_COLOR    "\033[33m"
-#define NOTIFY_COLOR    "\033[37m"
-#define QUESTION_COLOR  "\033[1;37m"
+#define NOTIFY_COLOR    //"\033[37m"
+#define QUESTION_COLOR  //"\033[1;37m"
 #define RESET_COLOR     "\033[0m"
 
 bool enableDebug;
@@ -199,8 +199,8 @@ int main(int argc, char *argv[])
     QString locale = QLocale::system().name();
     QTranslator translator, translator_bin;
     QString qmfile = QString("%1/i18n_qm/%2.qm").arg(GET_STR(UKUI_BIOMETRIC)).arg(locale);
-    QString qmfile_bin = QString("%1/bioauth-bin/i18n_qm/%2.qm").arg(GET_STR(UKUI_BIOMETRIC)).arg(locale);
-    //qDebug() << "load translation file " << qmfile << qmfile_bin;
+    QString qmfile_bin = QString("%1/i18n_qm/bioauth-bin/%2.qm").arg(GET_STR(UKUI_BIOMETRIC)).arg(locale);
+    qDebug() << "load translation file " << qmfile << qmfile_bin;
     translator.load(qmfile);
     translator_bin.load((qmfile_bin));
     a.installTranslator(&translator);

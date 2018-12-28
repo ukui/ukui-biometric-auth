@@ -102,6 +102,8 @@ void BioAuthWidget::startAuth(uid_t uid, const DeviceInfo &device)
     this->uid = uid;
     this->device = device;
 
+    ui->lblBioDevice->setText(tr("Current Device: ") + device.device_shortname);
+
     if(bioAuth) {
         delete bioAuth;
         bioAuth = nullptr;

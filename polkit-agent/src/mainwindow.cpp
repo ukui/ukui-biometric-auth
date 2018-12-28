@@ -19,6 +19,7 @@
 #include "ui_mainwindow.h"
 #include <QMovie>
 #include <QFile>
+#include <QDir>
 #include <QPainter>
 #include <QPixmap>
 #include <QFontMetrics>
@@ -88,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->cmbUsers->hide();
     ui->widgetDetails->hide();
-    ui->btnDetails->setIcon(QIcon(":/image/assets/right-arrow.png"));
+    ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
 
     switchWidget(UNDEFINED);
 }
@@ -121,12 +122,12 @@ void MainWindow::on_btnDetails_clicked()
 {
     if(ui->widgetDetails->isHidden()) {
         ui->widgetDetails->show();
-        ui->btnDetails->setIcon(QIcon(":/image/assets/left-arrow.png"));
+        ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_down.svg"));
 //        resize(width(), height() + ui->widgetDetails->height());
     }
     else {
         ui->widgetDetails->hide();
-        ui->btnDetails->setIcon(QIcon(":/image/assets/right-arrow.png"));
+        ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
 //        resize(width(), height() - ui->widgetDetails->height());
     }
     adjustSize();
@@ -164,6 +165,19 @@ void MainWindow::on_btnBioAuth_clicked()
 
 void MainWindow::setIcon(const QString &iconName)
 {
+    QIcon::setThemeName("ukui-icon-theme");
+    if(!QIcon::hasThemeIcon("dialog-password")) {
+        QDir iconsDir("/usr/share/icons");
+        auto themesList = iconsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        qDebug() << themesList;
+        for(auto theme : themesList) {
+            QIcon::setThemeName(theme);
+            if(QIcon::hasThemeIcon("dialog-password")) {
+                qDebug() << theme << "has dialog-password";
+                break;
+            }
+        }
+    }
     QPixmap icon = QIcon::fromTheme("dialog-password").pixmap(64, 64);
     QPixmap actionIcon = QIcon::fromTheme(iconName).pixmap(32, 32);
     QPainter painter;

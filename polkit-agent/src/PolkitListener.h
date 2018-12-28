@@ -19,7 +19,7 @@
 #define POLKITLISTENER_H
 
 #include <PolkitQt1/Agent/Listener>
-#include <QWeakPointer>
+#include <QPointer>
 
 #include "mainwindow.h"
 
@@ -51,7 +51,7 @@ private:
     bool wasSwitchToBiometric;
     bool inProgress;
 	int numTries;
-	QWeakPointer<Session> session;
+    QPointer<Session> session;
 	PolkitQt1::Identity::List identities;
 	PolkitQt1::Identity currentIdentity;
 	PolkitQt1::Agent::AsyncResult *result;

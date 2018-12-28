@@ -4,7 +4,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/mainwindow.cpp" line="40"/>
+        <location filename="../src/mainwindow.cpp" line="41"/>
         <source>Authentication</source>
         <translation>授权</translation>
     </message>
@@ -95,17 +95,17 @@
         <translation type="vanished">授权</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="151"/>
+        <location filename="../src/mainwindow.cpp" line="152"/>
         <source>in authentication, please wait...</source>
         <translation>认证中，请稍等...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="184"/>
+        <location filename="../src/mainwindow.cpp" line="198"/>
         <source>An application is attempting to perform an action that requires privileges. Authentication is required to perform this action.</source>
         <translation>一个程序正试图执行一个需要特权的动作。要求授权以执行该动作。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="219"/>
+        <location filename="../src/mainwindow.cpp" line="233"/>
         <source>Password: </source>
         <translation type="unfinished">密码： </translation>
     </message>
@@ -118,7 +118,7 @@
         <translation type="vanished">密码：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="236"/>
+        <location filename="../src/mainwindow.cpp" line="250"/>
         <source>Authentication failed, please try again.</source>
         <translation>认证失败，请重试。</translation>
     </message>

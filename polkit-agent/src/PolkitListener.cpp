@@ -243,6 +243,7 @@ void PolkitListener::onShowPrompt(const QString &prompt, bool echo)
     }
 
     mainWindow->show();
+    mainWindow->activateWindow();
 }
 
 void PolkitListener::onShowError(const QString &text)
