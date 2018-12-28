@@ -1,5 +1,5 @@
+/etc/biometric-auth/ukui-biometric.conf
 /bin/*
 /lib/security/*
 /usr/share/ukui-biometric/bioauth-bin/*
 /usr/share/pam-configs/*
-/usr/share/ukui-biometric/biometric-auth.conf

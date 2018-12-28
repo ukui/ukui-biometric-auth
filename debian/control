@@ -4,9 +4,11 @@ Priority: optional
 Maintainer: Kylin Team <team+kylin@tracker.debian.org>
 Uploaders: handsome_feng <jianfengli@ubuntukylin.com>
 Build-Depends: debhelper (>= 11),
+               cmake (>= 2.6),
                qtbase5-dev,
                libpam-dev,
                libpolkit-qt5-1-dev,
+			   qttools5-dev,
                qttools5-dev-tools,
 			   pkg-config
 Standards-Version: 4.2.1
