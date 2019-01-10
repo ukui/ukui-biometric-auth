@@ -1,3 +1,9 @@
+ukui-biometric-auth (0.6.16-2) juniper; urgency=medium
+
+  * Change the path of script in the policy file.
+
+ -- yanghao <yanghao@kylinos.cn>  Thu, 10 Jan 2019 13:57:17 +0800
+
 ukui-biometric-auth (0.6.16-1) juniper; urgency=medium
 
   * Add biometric icons and movie images.
