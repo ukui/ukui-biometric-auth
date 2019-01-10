@@ -1,13 +1,82 @@
-ukui-biometric-auth (1.0.3-1) unstable; urgency=medium
+ukui-biometric-auth (0.6.16-1) juniper; urgency=medium
 
-  * Bugfix: ukui-polkit does not load translation.
-  * Add biodrvctl to control devices' driver enable or disable.
-  * Add display the current device's name when biometric authentication.
+  * Add biometric icons and movie images.
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Thu, 03 Jan 2019 13:58:34 +0800
+ -- yanghao <yanghao@kylinos.cn>  Fri, 04 Jan 2019 16:10:20 +0800
 
-ukui-biometric-auth (1.0.2-1) unstable; urgency=medium
+ukui-biometric-auth (0.6.15~rc3) juniper; urgency=medium
 
-  * Initial release. (Closes: #908469)
+  * Change the permissions of the scripts.
+  * Change the path of 'bioauth' called in pam_biometric.so
 
- -- handsome_feng <jianfengli@ubuntukylin.com>  Tue, 25 Sep 2018 15:37:06 +0800
+ -- yanghao <yanghao@kylinos.cn>  Fri, 30 Nov 2018 15:41:12 +0800
+
+ukui-biometric-auth (0.6.15~rc2) juniper; urgency=medium
+
+  * cancel the color of prompt and question in bioauth cmd.
+
+ -- yanghao <yanghao@kylinos.cn>  Fri, 23 Nov 2018 15:49:51 +0800
+
+ukui-biometric-auth (0.6.15~rc1) juniper; urgency=medium
+
+  * Migrate to cmake
+  * Add a series of biometric images which can be made
+    up of some animation.
+  * Replace the icons of the detail button.
+  * Display the name of current device.
+
+ -- yanghao <yanghao@kylinos.cn>  Thu, 22 Nov 2018 13:59:38 +0800
+
+ukui-biometric-auth (0.6.14~rc1) juniper; urgency=medium
+
+  * add biodrvctl
+    - the tool for control driver's status
+  * fix the bug that polkit can't load qm file
+
+ -- yanghao <yanghao@kylinos.cn>  Fri, 28 Sep 2018 16:59:18 +0800
+
+ukui-biometric-auth (0.6.13~rc3) juniper; urgency=medium
+
+  * update debian dir
+    - libpam-biometric.install: add policy action file
+
+ -- yanghao <yanghao@kylinos.cn>  Thu, 27 Sep 2018 15:22:52 +0800
+
+ukui-biometric-auth (0.6.13~rc2) juniper; urgency=medium
+
+  * update debian dir
+    - the rule file's duties devolved upon the Makefile
+    - add install file
+
+ -- yanghao <yanghao@kylinos.cn>  Wed, 26 Sep 2018 17:19:34 +0800
+
+ukui-biometric-auth (0.6.13~rc1) juniper; urgency=medium
+
+  * remove pam-biometric-dialog and add bioauth
+    - cancel the gui of su/sudo and use cmd prompt
+
+ -- yanghao <yanghao@kylinos.cn>  Wed, 26 Sep 2018 15:19:50 +0800
+
+ukui-biometric-auth (0.6.12~rc2) juniper; urgency=medium
+
+  * add libpam0g depends
+
+ -- yanghao <yanghao@kylinos.cn>  Mon, 17 Sep 2018 17:13:54 +0800
+
+ukui-biometric-auth (0.6.12~rc1) juniper; urgency=medium
+
+  * ui fine-tuning
+  * don't send biometric failure result to pam
+  * add support for default device
+  * pam-dialog: add debug option
+  * polkit-agent: implement autorestart
+
+ -- yanghao <yanghao@kylinos.cn>  Mon, 17 Sep 2018 10:05:33 +0800
+
+ukui-biometric-auth (0.6.11~rc1) juniper; urgency=medium
+
+  * Initial release
+    rename from biometric-verification
+    split one package to libpam-biometric and ukui-polkit
+
+ -- yanghao <yanghao@kylinos.cn>  Tue, 04 Sep 2018 15:37:52 +0800
