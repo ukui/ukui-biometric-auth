@@ -15,7 +15,7 @@
 			<allow_inactive>auth_admin</allow_inactive>
 			<allow_active>auth_admin_keep</allow_active>
 		</defaults>s
-		<annotate key="org.freedesktop.policykit.exec.path">/bin/bioctl</annotate>
+        <annotate key="org.freedesktop.policykit.exec.path">${SCRIPTS_INSTALL_PATH}/bioctl</annotate>
 	</action>
 
 </policyconfig>

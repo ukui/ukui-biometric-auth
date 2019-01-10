@@ -7,6 +7,16 @@ if(NOT PAM_INCLUDE_DIR OR NOT PAM_LIB)
     message(FATAL_ERROR "pam_modules.h not found")
 endif()
 
+set(SCRIPTS_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+configure_file(
+    ${PROJECT_SOURCE_DIR}/data/org.freedesktop.plicykit.pkexec.bioctl.policy.in
+    ${PROJECT_BINARY_DIR}/data/org.freedesktop.plicykit.pkexec.bioctl.policy
+    )
+configure_file(
+    ${PROJECT_SOURCE_DIR}/data/org.freedesktop.plicykit.pkexec.biodrvctl.policy.in
+    ${PROJECT_BINARY_DIR}/data/org.freedesktop.plicykit.pkexec.biodrvctl.policy
+    )
+
 set(pam_SRCS
     pam_biometric.c
     logger.c
@@ -26,8 +36,9 @@ set_target_properties(pam_biometric PROPERTIES PREFIX "")
 install(TARGETS pam_biometric DESTINATION /lib/security)
 install(FILES pam-configs/pam-biometric DESTINATION /usr/share/pam-configs)
 install(FILES data/ukui-biometric.conf DESTINATION /etc/biometric-auth)
-install(FILES data/org.freedesktop.plicykit.pkexec.bioctl.policy
-    data/org.freedesktop.plicykit.pkexec.biodrvctl.policy
+install(FILES
+    ${PROJECT_BINARY_DIR}/data/org.freedesktop.plicykit.pkexec.bioctl.policy
+    ${PROJECT_BINARY_DIR}/data/org.freedesktop.plicykit.pkexec.biodrvctl.policy
     DESTINATION /usr/share/polkit-1/actions
     )
 install(FILES utils/bioctl utils/biodrvctl DESTINATION bin PERMISSIONS ${CONDOR_SCRIPT_PERMS})
