@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     agent.installTranslator(&translator_main);
     agent.installTranslator(&translator_bio);
 
-    SessionManager sm;
+//    SessionManager sm;
 
     /* Run forever */
     agent.setQuitOnLastWindowClosed(false);

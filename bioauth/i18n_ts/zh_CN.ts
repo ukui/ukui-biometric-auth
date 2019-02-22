@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>BioAuth</name>
+    <message>
+        <location filename="../src/bioauth.cpp" line="177"/>
+        <source>Identify failed, Please retry.</source>
+        <translation>识别失败，请重试。</translation>
+    </message>
+</context>
+<context>
     <name>BioAuthWidget</name>
     <message>
         <location filename="../src/bioauthwidget.ui" line="14"/>
@@ -39,27 +47,27 @@
 <context>
     <name>BioDevices</name>
     <message>
-        <location filename="../src/biodevices.cpp" line="168"/>
+        <location filename="../src/biodevices.cpp" line="170"/>
         <source>FingerPrint</source>
         <translation>指纹</translation>
     </message>
     <message>
-        <location filename="../src/biodevices.cpp" line="170"/>
+        <location filename="../src/biodevices.cpp" line="172"/>
         <source>FingerVein</source>
         <translation>指静脉</translation>
     </message>
     <message>
-        <location filename="../src/biodevices.cpp" line="172"/>
+        <location filename="../src/biodevices.cpp" line="174"/>
         <source>Iris</source>
         <translation>虹膜</translation>
     </message>
     <message>
-        <location filename="../src/biodevices.cpp" line="174"/>
+        <location filename="../src/biodevices.cpp" line="176"/>
         <source>Face</source>
         <translation>人脸</translation>
     </message>
     <message>
-        <location filename="../src/biodevices.cpp" line="176"/>
+        <location filename="../src/biodevices.cpp" line="178"/>
         <source>VoicePrint</source>
         <translation>声纹</translation>
     </message>
