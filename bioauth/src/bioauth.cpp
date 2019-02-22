@@ -17,12 +17,68 @@
 **/
 #include "bioauth.h"
 #include <QList>
+#include <pwd.h>
+
+#define UKUI_BIOMETRIC_CONFIG_PATH  ".biometric_auth/ukui_biometric.conf"
+#define UKUI_BIOMETRIC_SYS_CONFIG_PATH  "/etc/biometric-auth/ukui-biometric.conf"
+
+QString GetDefaultDevice(const QString &userName)
+{
+    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
+    QSettings settings(configPath, QSettings::IniFormat);
+
+    QString defaultDevice = settings.value("DefaultDevice").toString();
+    if(defaultDevice.isEmpty())
+    {
+        QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
+        defaultDevice = sysSettings.value("DefaultDevice").toString();
+    }
+
+    return defaultDevice;
+}
+
+static int getValueFromSettings(const QString &userName, const QString &key, int defaultValue = 3)
+{
+    //从家目录下的配置文件中获取
+    QString configPath = QString("/home/%1/" UKUI_BIOMETRIC_CONFIG_PATH).arg(userName);
+    QSettings settings(configPath, QSettings::IniFormat);
+    QString valueStr = settings.value(key).toString();
+
+    //如果没有获取到，则从系统配置文件中获取
+    if(valueStr.isEmpty())
+    {
+        QSettings sysSettings(UKUI_BIOMETRIC_SYS_CONFIG_PATH, QSettings::IniFormat);
+        valueStr = sysSettings.value(key).toString();
+    }
+
+    bool ok;
+    int value = valueStr.toInt(&ok);
+    if( (value == 0 && !ok) || valueStr.isEmpty() )
+    {
+        value = defaultValue;
+    }
+    return value;
+}
+
+int GetMaxFailedAutoRetry(const QString &userName)
+{
+    return getValueFromSettings(userName, "MaxFailedAutoRetry");
+}
+
+int GetMaxTimeoutAutoRetry(const QString &userName)
+{
+    return getValueFromSettings(userName, "MaxTimeoutAutoRetry");
+}
+
 
 BioAuth::BioAuth(qint32 uid, const DeviceInfo &deviceInfo, QObject *parent)
     : QObject(parent),
+      userName(getpwuid(uid)->pw_name),
       uid(uid),
       deviceInfo(deviceInfo),
-      isInAuthentication(false)
+      isInAuthentication(false),
+      failedCount(0),
+      beStopped(false)
 {
     serviceInterface = new QDBusInterface(BIO_DBUS_SERVICE,
                                           BIO_DBUS_PATH,
@@ -51,11 +107,20 @@ void BioAuth::startAuth()
 
     /* 开始认证识别 */
     LOG() << "start biometric verification";
+
+    failedCount = 0;
+    beStopped = false;
+
+    _startAuth();
+}
+
+void BioAuth::_startAuth()
+{
+    isInAuthentication = true;
+
     QList<QVariant> args;
     args << QVariant(deviceInfo.device_id) << QVariant(uid)
          << QVariant(0) << QVariant(-1);
-    isInAuthentication = true;
-
     QDBusPendingCall call = serviceInterface->asyncCallWithArgumentList("Identify", args);
     QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
     connect(watcher, &QDBusPendingCallWatcher::finished, this, &BioAuth::onIdentityComplete);
@@ -64,9 +129,9 @@ void BioAuth::startAuth()
 
 void BioAuth::stopAuth()
 {
+    beStopped = true;
+
     QDBusReply<int> reply = serviceInterface->call("StopOps", QVariant(deviceInfo.device_id), QVariant(5));
-
-
     if(!reply.isValid())
         qWarning() << "StopOps error: " << reply.error();
 
@@ -80,8 +145,6 @@ bool BioAuth::isAuthenticating()
 
 void BioAuth::onIdentityComplete(QDBusPendingCallWatcher *watcher)
 {
-
-
     QDBusPendingReply<qint32, qint32> reply = *watcher;
     if(reply.isError()){
         isInAuthentication = false;
@@ -99,9 +162,27 @@ void BioAuth::onIdentityComplete(QDBusPendingCallWatcher *watcher)
         isInAuthentication = false;
 
         if(result == DBUS_RESULT_SUCCESS && retUid == uid)
+        {
             Q_EMIT authComplete(retUid, true);
-        else
-            Q_EMIT authComplete(retUid, false);
+        }
+        else if(result == DBUS_RESULT_NOTMATCH)
+        {
+            failedCount++;
+            if(failedCount >= GetMaxFailedAutoRetry(userName))
+            {
+                Q_EMIT authComplete(retUid, false);
+            }
+            else
+            {
+                Q_EMIT notify(tr("Identify failed, Please retry."));
+                QTimer::singleShot(1000, [&]{
+                    if(!beStopped)
+                    {
+                        _startAuth();
+                    }
+                });
+            }
+        }
     }
 }
 
