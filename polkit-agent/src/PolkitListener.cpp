@@ -22,7 +22,7 @@
 #include <PolkitQt1/Details>
 #include <PolkitQt1/Authority>
 #include <PolkitQt1/ActionDescription>
-#include <qt5/QtWidgets/qdialogbuttonbox.h>
+#include <qdialogbuttonbox.h>
 
 #include <QDebug>
 #include <QDesktopWidget>
