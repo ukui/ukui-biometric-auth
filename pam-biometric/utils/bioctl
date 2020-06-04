@@ -26,7 +26,15 @@ contain_key=`grep -c "^EnableAuth=" $CONFIG_FILE`
 
 if [ "$1" = "enable" ]; then
 	test_privilege
-	pam-auth-update --package pam-biometric
+	# 生物识别管理工具在打开生物识别开关的时候会调用这个脚本，
+	# 如果之前手动改过pam的配置文件，在执行这个脚本的时候会有交互
+	# 性提示，但前端程序上看不到，导致生物识别管理工具阻塞，不过
+	# 由于在安装pam_biomtric这个包时已经执行了这个命令，且会通过
+	# /etc/biometric-auth 配置文件来判断生物识别状态，所以也不需要
+	#执行 pam-auth-update 了。
+
+	#pam-auth-update --package pam-biometric
+
 	if [ "$contain_key" = "1" ]; then
 		sed -i 's/^EnableAuth=[a-zA-Z0-9]*/EnableAuth=true/g' $CONFIG_FILE
 	else
