@@ -22,6 +22,7 @@
 #include <QLabel>
 #include "biometric.h"
 #include "users.h"
+#include "pam-tally.h"
 
 namespace Ui {
 class MainWindow;
@@ -62,6 +63,11 @@ private:
     void switchWidget(Mode mode);
     int enable_biometric_authentication();
 
+
+    void root_unlock_countdown();
+    void unlock_countdown();
+    
+
 private slots:
     void on_btnDetails_clicked();
     void on_lePassword_returnPressed();
@@ -95,6 +101,8 @@ private:
     int  maxFailedTimes;
     bool isHiddenSwitchButton;
 
+    QTimer *m_timer;
+    bool isLockingFlg;   //判断当前是否正在锁定倒计时
 };
 
 #endif // MAINWINDOW_H

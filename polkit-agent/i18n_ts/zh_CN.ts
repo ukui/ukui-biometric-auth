@@ -110,6 +110,25 @@
         <translation>认证中，请稍等...</translation>
     </message>
     <message>
+        <location filename="../src/authdialog.cpp" line="185"/>
+        <source>Please try again in %1 minutes.</source>
+        <translation>请%1分钟后再试</translation>
+    </message>
+    <message>
+        <location filename="../src/authdialog.cpp" line="195"/>
+        <source>Please try again in %1 seconds.</source>
+        <translation>请%1秒后再试</translation>
+    </message>
+    <message>
+        <location filename="../src/authdialog.cpp" line="195"/>
+        <source>Account locked permanently.</source>
+        <translation>账号已被永久锁定</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
+        <translation>密码不能为空</translation>
+    </message>
+    <message>
         <location filename="../src/mainwindow.cpp" line="288"/>
         <source>An application is attempting to perform an action that requires privileges. Authentication is required to perform this action.</source>
         <translation>一个程序正试图执行一个需要特权的动作。要求授权以执行该动作。</translation>

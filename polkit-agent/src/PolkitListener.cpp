@@ -211,19 +211,22 @@ void PolkitListener::finishObtainPrivilege()
                     .arg(mainWindow != NULL);
 
     if (!gainedAuthorization && !wasCancelled && (mainWindow != NULL)) {
-        int deny = 0, unlock_time = 0;
-        mainWindow->stopDoubleAuth();
-        if(!get_pam_tally(&deny, &unlock_time)||(deny  == 0 &&unlock_time == 0)) {
-            if(!wasSwitchToBiometric){
-                mainWindow->setAuthResult(gainedAuthorization, tr("Authentication failure, please try again."));
-            }
-            startAuthentication();
+        // int deny = 0, unlock_time = 0;
+        // mainWindow->stopDoubleAuth();
+        // if(!get_pam_tally(&deny, &unlock_time)||(deny  == 0 &&unlock_time == 0)) {
+        //     if(!wasSwitchToBiometric){
+        //         mainWindow->setAuthResult(gainedAuthorization, tr("Authentication failure, please try again."));
+        //     }
+        //     startAuthentication();
+        //     return;
+        // }
+        // else {
+        //     startAuthentication();
+        //     return;
+        // }
+        
+        startAuthentication();
             return;
-        }
-        else {
-            startAuthentication();
-            return;
-        }
     }
 
     if (mainWindow) {

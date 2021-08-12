@@ -44,11 +44,15 @@ MainWindow::MainWindow(QWidget *parent) :
     receiveBioPAM(false),
     authMode(UNDEFINED),
     useDoubleAuth(false),
+    m_timer(nullptr),
+    isLockingFlg(false),
     isbioSuccess(false)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Authentication"));
     setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    pam_tally_init(); //
 
     widgetBioAuth = new BioAuthWidget(this);
     widgetBioDevices = new BioDevicesWidget(this);
@@ -243,8 +247,9 @@ void MainWindow::on_btnAuth_clicked()
 void MainWindow::on_lePassword_returnPressed()
 {
     emit accept(ui->lePassword->text());
-    switchWidget(UNDEFINED);
-    setMessage(tr("in authentication, please wait..."));
+    ui->btnAuth->hide();
+    // switchWidget(UNDEFINED);
+    // setMessage(tr("in authentication, please wait..."));
 }
 
 void MainWindow::on_btnBioAuth_clicked()
@@ -349,6 +354,13 @@ void MainWindow::setPrompt(const QString &text, bool echo)
                 setMessage(tr("Please enter your password or enroll your fingerprint "));
         }
     }
+    if(!m_timer){
+            m_timer = new QTimer(this);
+            m_timer->setInterval(200);
+            connect(m_timer, &QTimer::timeout, this, &MainWindow::unlock_countdown);
+        }
+        //qDebug() << "6666";
+        m_timer->start();
 
     ui->lblPrompt->setText(prompt);
     ui->lePassword->setEchoMode(echo ? QLineEdit::Normal : QLineEdit::Password);
@@ -403,7 +415,26 @@ QString MainWindow::check_is_pam_message(QString text)
 void MainWindow::setMessage(const QString &text)
 {
     // QString message = this->check_is_pam_message(text);
-    ui->lblMessage->setText(text);
+    qDebug()<<"receive：text = "<<text;
+    if (text.indexOf("account locked") != -1 || text.indexOf("账户已锁定") != -1 
+        || text.indexOf("Account locked") != -1 || text.indexOf("永久锁定") != -1)
+    {
+        if(!m_timer){
+            m_timer = new QTimer(this);
+            m_timer->setInterval(400);
+            connect(m_timer, &QTimer::timeout, this, &MainWindow::unlock_countdown);
+        }
+        m_timer->start();
+    }else if (text.indexOf("No password received, please input password") != -1)
+    {
+        ui->lblMessage->setText(tr("Password cannot be empty"));
+        ui->lblMessage->setToolTip(tr("Password cannot be empty"));
+    }else{
+        ui->lblMessage->setText(text);
+        ui->lblMessage->setToolTip(text);
+    }
+
+    // ui->lblMessage->setText(text);
 }
 
 void MainWindow::setAuthResult(bool result, const QString &text)
@@ -583,6 +614,118 @@ void MainWindow::switchWidget(Mode mode)
         break;
     }
     adjustSize();
+}
+
+void MainWindow::unlock_countdown()
+{
+    int failed_count = 0;
+    int time_left = 0;
+    int deny = 0;
+    int fail_time =0;
+    int unlock_time = 0;
+    pam_tally_unlock_time_left(&failed_count, &time_left, &deny,&fail_time,&unlock_time);
+
+    // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
+    if(time_left/60 > 0)//请多少分钟后重试
+    {
+        char ch[100]={0};
+        int nMinute = time_left/60 + 1;
+        ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if(time_left > 0)//请多少秒后重试
+    {
+        char ch[100]={0};
+        ui->lblMessage->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if (failed_count == 0xFFFF)//账号被永久锁定
+    {
+        ui->lblMessage->setText(tr("Account locked permanently."));
+        ui->lblMessage->setToolTip(tr("Account locked permanently."));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else
+    {
+        if(ui->lePassword){
+            ui->lePassword->setDisabled(false);
+            ui->lePassword->setFocus();
+        }
+
+        if (isLockingFlg)
+        {
+            ui->lblMessage->setText("");
+        }
+            
+        m_timer->stop();
+    }
+    return ;
+}
+
+void MainWindow::root_unlock_countdown()
+{
+    int failed_count = 0;
+    int time_left = 0;
+    int deny = 0;
+    pam_tally_root_unlock_time_left(&failed_count, &time_left, &deny);
+
+    // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
+    if(time_left/60 > 0)//请多少分钟后重试
+    {
+        char ch[100]={0};
+        int nMinute = time_left/60 + 1;
+        ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if(time_left > 0)//请多少秒后重试
+    {
+        char ch[100]={0};
+        ui->lblMessage->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if (failed_count == 0xFFFF)//账号被永久锁定
+    {
+        ui->lblMessage->setText(tr("Account locked permanently."));
+        ui->lblMessage->setToolTip(tr("Account locked permanently."));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else
+    {
+        if(ui->lePassword){
+            ui->lePassword->setDisabled(false);
+            ui->lePassword->setFocus();
+        }
+
+        if (isLockingFlg)
+        {
+            ui->lblMessage->setText("");
+        }
+            
+        m_timer->stop();
+    }
+    return ;
 }
 
 /*** end of private member ***/
