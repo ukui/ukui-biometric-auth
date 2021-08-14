@@ -756,8 +756,8 @@ void MainWindow::unlock_countdown()
     {
         char ch[100]={0};
         int nMinute = time_left/60 + 1;
-        ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
-        ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
+        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -766,8 +766,8 @@ void MainWindow::unlock_countdown()
     else if(time_left > 0)//请多少秒后重试
     {
         char ch[100]={0};
-        ui->lblMessage->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
-        ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
+        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -811,8 +811,8 @@ void MainWindow::root_unlock_countdown()
     {
         char ch[100]={0};
         int nMinute = time_left/60 + 1;
-        ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
-        ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
+        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -821,8 +821,8 @@ void MainWindow::root_unlock_countdown()
     else if(time_left > 0)//请多少秒后重试
     {
         char ch[100]={0};
-        ui->lblMessage->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
-        ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
+        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;

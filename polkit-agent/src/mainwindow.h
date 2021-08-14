@@ -49,7 +49,7 @@ public:
                     const QString &actionId, const QString &actionDesc,
                     const QString vendorName, const QString vendorUrl);
     void setPrompt(const QString &text, bool echo);
-    void setMessage(const QString &text,situation situat = TRUE);
+    void setMessage(const QString &text,situation situat = ERROR);
     void setAuthResult(bool result, const QString &text="");
     void clearEdit();
     void switchAuthMode(Mode mode);
