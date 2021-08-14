@@ -32,10 +32,12 @@
 #include <pwd.h>
 #include <libintl.h>
 #include <locale.h>
-
+#include "bioauthwidget.h"
+#include <QHBoxLayout>
+#include <QAction>
 #include "generic.h"
 #define _(string) gettext(string)
-
+extern void qt_blurImage(QImage &blurImage, qreal radius, bool quality, int transposed);
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
@@ -56,8 +58,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     widgetBioAuth = new BioAuthWidget(this);
     widgetBioDevices = new BioDevicesWidget(this);
-    ui->formLayout->addWidget(widgetBioAuth);
-    ui->formLayout->addWidget(widgetBioDevices);
+    //ui->formLayout->addWidget(widgetBioAuth);
+    //ui->formLayout->addWidget(widgetBioDevices);
+
+    ui->bioAuthLayout->addWidget(widgetBioAuth);
+    ui->bioAuthLayout->addWidget(widgetBioDevices);
+
     maxFailedTimes = bioDevices.getFailedTimes();
     isHiddenSwitchButton = bioDevices.GetHiddenSwitchButton();
 
@@ -129,12 +135,15 @@ MainWindow::MainWindow(QWidget *parent) :
     setStyleSheet(qssFile.readAll());
     qssFile.close();
 
-    ui->cmbUsers->hide();
-    ui->widgetDetails->hide();
-    ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
-    ui->btnDetails->hide();
-    ui->lePassword->installEventFilter(this);
+    //ui->cmbUsers->hide();
+    //ui->widgetDetails->hide();
+    //ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
+    //ui->btnDetails->hide();
+    //ui->lePassword->installEventFilter(this);
     switchWidget(UNDEFINED);
+    editIcon();
+    ui->lblContent->adjustSize();
+    ui->lblContent->height();
 }
 
 MainWindow::~MainWindow()
@@ -157,6 +166,52 @@ void MainWindow::closeEvent(QCloseEvent *event)
     emit canceled();
 
     return QWidget::closeEvent(event);
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+
+    Q_UNUSED(event);
+    QStyleOption *option = new QStyleOption();
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    QPainterPath rectPath;
+    rectPath.addRoundedRect(this->rect().adjusted(0,0,0,0),0,0);
+    // 画一个黑底
+    QPixmap pixmap(this->rect().size());
+    pixmap.fill(Qt::transparent);
+    QPainter pixmapPainter(&pixmap);
+    pixmapPainter.setRenderHint(QPainter::Antialiasing);
+    pixmapPainter.setPen(Qt::transparent);
+    pixmapPainter.setBrush(QColor(0,0,0,100));
+    pixmapPainter.drawPath(rectPath);
+    pixmapPainter.end();
+
+    // 模糊这个黑底
+    QImage img = pixmap.toImage();
+    qt_blurImage(img, 10, false, false);
+
+    // 挖掉中心
+    pixmap = QPixmap::fromImage(img);
+    QPainter pixmapPainter2(&pixmap);
+    pixmapPainter2.setRenderHint(QPainter::Antialiasing);
+    pixmapPainter2.setCompositionMode(QPainter::CompositionMode_Clear);
+    pixmapPainter2.setPen(Qt::transparent);
+    pixmapPainter2.setBrush(Qt::transparent);
+    pixmapPainter2.drawPath(rectPath);
+
+    // 绘制阴影
+    p.drawPixmap(this->rect(), pixmap, pixmap.rect());
+
+    // 绘制一个背景
+    p.save();
+    p.fillPath(rectPath,option->palette.color(QPalette::Base));
+    p.restore();
+    //绘制一个矩形
+
+    p.setPen(Qt::red);
+    QRectF rect(0,290,20,20);
+
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -218,7 +273,7 @@ int MainWindow::enable_biometric_authentication()
 }
 
 void MainWindow::on_btnDetails_clicked()
-{
+{/*
     if(ui->widgetDetails->isHidden()) {
         ui->widgetDetails->show();
         ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_down.svg"));
@@ -229,7 +284,7 @@ void MainWindow::on_btnDetails_clicked()
         ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
 //        resize(width(), height() - ui->widgetDetails->height());
     }
-    adjustSize();
+    adjustSize();*/
 }
 
 void MainWindow::on_btnCancel_clicked()
@@ -243,6 +298,33 @@ void MainWindow::on_btnAuth_clicked()
 }
 
 /*** pagePassword ***/
+void MainWindow::editIcon()
+{
+    m_modeButton = new QPushButton(ui->lePassword);
+    m_modeButton->setObjectName(QStringLiteral("echoModeButton"));
+    m_modeButton->setCheckable(true);
+    m_modeButton->setFocusPolicy(Qt::NoFocus);
+    m_modeButton->setCursor(Qt::PointingHandCursor);
+    connect(m_modeButton, &QPushButton::clicked, this, [&](bool checked){
+        setType(checked ? QLineEdit::Normal : QLineEdit::Password);
+    });
+    QHBoxLayout *layout = new QHBoxLayout(ui->lePassword);
+    //layout->setSpacing(0);
+    layout->addStretch();
+    layout->addWidget(m_modeButton);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+
+}
+
+void MainWindow::setType(QLineEdit::EchoMode type)
+{
+    ui->lePassword->setEchoMode(type);
+    if(type == 0)
+       m_modeButton->setChecked(true);
+    else
+       m_modeButton->setChecked(false);
+}
 
 void MainWindow::on_lePassword_returnPressed()
 {
@@ -258,6 +340,13 @@ void MainWindow::on_btnBioAuth_clicked()
     authMode = BIOMETRIC;
 }
 
+void MainWindow::on_returnButton_clicked()
+{
+
+    widgetBioAuth->stopAuth();
+    accept(BIOMETRIC_IGNORE);
+
+}
 /*** end of control's slot ***/
 
 
@@ -290,12 +379,14 @@ void MainWindow::setIcon(const QString &iconName)
     painter.end();
 
     setWindowIcon(icon);
-    ui->lblIcon->setPixmap(icon);
+    //ui->lblIcon->setPixmap(icon);
 }
 
 void MainWindow::setHeader(const QString &text)
 {
     ui->lblHeader->setText(text);
+    ui->lblHeader->adjustSize();
+    ui->lblHeader->height();
     ui->lblContent->setText(tr("An application is attempting to perform an action that requires privileges."
                             " Authentication is required to perform this action."));
 
@@ -328,8 +419,10 @@ void MainWindow::setUsers(const QStringList &usersList)
     }
 
     ui->cmbUsers->show();
+    ui->cmbUsers->adjustSize();
+    ui->cmbUsers->height();
 }
-
+/*
 void MainWindow::setDetails(const QString &subPid, const QString &callerPid, const QString &actionId,
                             const QString &actionDesc, const QString vendorName,
                             const QString vendorUrl)
@@ -341,7 +434,7 @@ void MainWindow::setDetails(const QString &subPid, const QString &callerPid, con
     QString vendor = QString("<a href=\"%1\">%2").arg(vendorUrl).arg(vendorName);
     ui->lblVendor->setText(vendor);
 }
-
+*/
 void MainWindow::setPrompt(const QString &text, bool echo)
 {
     QString prompt = text;
@@ -362,7 +455,9 @@ void MainWindow::setPrompt(const QString &text, bool echo)
         //qDebug() << "6666";
         m_timer->start();
 
-    ui->lblPrompt->setText(prompt);
+    ui->lePassword->clear();
+    ui->lePassword->setPlaceholderText(prompt);
+    //ui->lblMessage->setText(prompt);
     ui->lePassword->setEchoMode(echo ? QLineEdit::Normal : QLineEdit::Password);
     switchWidget(PASSWORD);
 }
@@ -412,9 +507,14 @@ QString MainWindow::check_is_pam_message(QString text)
 
 }
 
-void MainWindow::setMessage(const QString &text)
+void MainWindow::setMessage(const QString &text,situation situat)
 {
     // QString message = this->check_is_pam_message(text);
+    if(situat == ERROR){
+        ui->lblMessage->setStyleSheet("color: #F3222D;");
+    }else if(situat == TRUE){
+        ui->lblMessage->setStyleSheet("");
+    }
     qDebug()<<"receive：text = "<<text;
     if (text.indexOf("account locked") != -1 || text.indexOf("账户已锁定") != -1 
         || text.indexOf("Account locked") != -1 || text.indexOf("永久锁定") != -1)
@@ -445,9 +545,9 @@ void MainWindow::setAuthResult(bool result, const QString &text)
         message = tr("Authentication failed, please try again.");
 
     if(authMode == PASSWORD)
-        ui->lblMessage->setText(message);
-//    else if(authMode == BIOMETRIC)
-//        ui->lblBioNotify->setText(message);
+        setMessage(message,ERROR);
+    else if(authMode == BIOMETRIC)
+        setMessage(message,ERROR);
 
     switchWidget(PASSWORD);
 }
@@ -599,17 +699,43 @@ void MainWindow::switchWidget(Mode mode)
     switch(mode){
     case PASSWORD:
         setMinimumWidth(420);
+        setMaximumWidth(420);
+        setMinimumHeight(211+ui->lblHeader->height()+ui->lblContent->height());
+        setMaximumHeight(211+ui->lblHeader->height()+ui->lblContent->height());
+        ui->btnBioAuth->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
+
+        ui->btnBioAuth->setFlat(true);
         ui->widgetPasswdAuth->show();
         ui->lePassword->setFocus();
         ui->lePassword->setAttribute(Qt::WA_InputMethodEnabled, false);
         ui->btnAuth->show();
+        ui->btnCancel->show();
+        //ui->btnBioAuth->show();
+        ui->lblContent->show();
+        ui->returnButton->hide();
+        //ui->cmbDevices->hide();
         break;
     case BIOMETRIC:
-        setMaximumWidth(380);
+        setMinimumWidth(420);
+        setMaximumWidth(420);
+        setMinimumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
+        setMaximumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
+
         widgetBioAuth->show();
+        ui->btnCancel->hide();
+        ui->lblContent->hide();
+        ui->btnBioAuth->hide();
+        ui->returnButton->show();
+        ui->returnButton->setFlat(true);
+        ui->returnButton->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
+
+        //ui->btnBioAuth->hide();
+        //ui->cmbDevices->show();
         break;
     case DEVICES:
-        widgetBioDevices->show();
+        widgetBioAuth->show();
+
+        break;
     default:
         break;
     }

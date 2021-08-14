@@ -33,8 +33,10 @@ BioAuthWidget::BioAuthWidget(QWidget *parent) :
     bioAuth(nullptr)
 {
     ui->setupUi(this);
+    ui->btnRetry->setFlat(true);
     ui->btnRetry->setVisible(false);
-    ui->btnMore->setVisible(false);
+    ui->btnRetry->setText(tr("Retry"));
+    //ui->btnMore->setVisible(false);
 }
 
 BioAuthWidget::~BioAuthWidget()
@@ -136,7 +138,7 @@ void BioAuthWidget::onFrameWritten(int deviceId)
 
 void BioAuthWidget::hidePasswdButton()
 {
-    ui->btnPasswdAuth->hide();
+    //ui->btnPasswdAuth->hide();
 }
 
 bool BioAuthWidget::isAuthenticating()
@@ -159,7 +161,7 @@ void BioAuthWidget::startAuth(uid_t uid, const DeviceInfo &device)
     this->uid = uid;
     this->device = device;
 
-    ui->lblBioDevice->setText(tr("Current Device: ") + device.device_shortname);
+    //ui->lblBioDevice->setText(tr("Current Device: ") + device.device_shortname);
 
     if(bioAuth) {
         bioAuth->stopAuth();
@@ -182,5 +184,5 @@ void BioAuthWidget::startAuth(uid_t uid, const DeviceInfo &device)
 
 void BioAuthWidget::setMoreDevices(bool hasMore)
 {
-    ui->btnMore->setVisible(hasMore);
+    //ui->btnMore->setVisible(hasMore);
 }
