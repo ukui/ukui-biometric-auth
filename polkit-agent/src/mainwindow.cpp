@@ -846,7 +846,7 @@ void MainWindow::root_unlock_countdown()
 
         if (isLockingFlg)
         {
-            setMessage->setText(tr("Authentication failed, please try again."),TRUE);
+            setMessage(tr("Authentication failed, please try again."),TRUE);
             isLockingFlg = false;
         }
             
