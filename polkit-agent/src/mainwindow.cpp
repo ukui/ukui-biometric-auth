@@ -521,7 +521,7 @@ void MainWindow::setMessage(const QString &text,situation situat)
     {
         if(!m_timer){
             m_timer = new QTimer(this);
-            m_timer->setInterval(400);
+            m_timer->setInterval(800);
             connect(m_timer, &QTimer::timeout, this, &MainWindow::unlock_countdown);
         }
         m_timer->start();
@@ -811,8 +811,8 @@ void MainWindow::root_unlock_countdown()
     {
         char ch[100]={0};
         int nMinute = time_left/60 + 1;
-        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
-        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
+        ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -821,8 +821,8 @@ void MainWindow::root_unlock_countdown()
     else if(time_left > 0)//请多少秒后重试
     {
         char ch[100]={0};
-        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
-        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
+        ui->lblMessage->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -846,7 +846,8 @@ void MainWindow::root_unlock_countdown()
 
         if (isLockingFlg)
         {
-            ui->lblMessage->setText("");
+            setMessage->setText(tr("Authentication failed, please try again."),TRUE);
+            isLockingFlg = false;
         }
             
         m_timer->stop();
