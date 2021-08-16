@@ -23,7 +23,9 @@
 #include "biometric.h"
 #include "users.h"
 #include "pam-tally.h"
-
+#include <QPushButton>
+#include <QLineEdit>
+#include "bioauthwidget.h"
 namespace Ui {
 class MainWindow;
 }
@@ -37,9 +39,9 @@ public:
     ~MainWindow();
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
-
+    void paintEvent(QPaintEvent *event);
     enum Mode{UNDEFINED, PASSWORD, BIOMETRIC, DEVICES};
-
+    enum situation{TRUE, ERROR};
     void setIcon(const QString &iconName);
     void setHeader(const QString &text);
     void setUsers(const QStringList &usersList);
@@ -47,13 +49,14 @@ public:
                     const QString &actionId, const QString &actionDesc,
                     const QString vendorName, const QString vendorUrl);
     void setPrompt(const QString &text, bool echo);
-    void setMessage(const QString &text);
+    void setMessage(const QString &text,situation situat = ERROR);
     void setAuthResult(bool result, const QString &text="");
     void clearEdit();
     void switchAuthMode(Mode mode);
     void setDoubleAuth(bool val);
     void stopDoubleAuth();
     QString check_is_pam_message(QString text);
+    void setType(QLineEdit::EchoMode type = QLineEdit::Password);
 
 private:    
     uid_t getUid(const QString &userName);
@@ -66,12 +69,13 @@ private:
 
     void root_unlock_countdown();
     void unlock_countdown();
-    
+    void editIcon();
 
 private slots:
     void on_btnDetails_clicked();
     void on_lePassword_returnPressed();
     void on_btnBioAuth_clicked();
+    void on_returnButton_clicked();
     void on_cmbUsers_currentTextChanged(const QString &userName);
     void on_btnCancel_clicked();
     void on_btnAuth_clicked();
@@ -100,7 +104,7 @@ private:
     QMap<qint32,int> m_failMap;
     int  maxFailedTimes;
     bool isHiddenSwitchButton;
-
+    QPushButton *m_modeButton;
     QTimer *m_timer;
     bool isLockingFlg;   //判断当前是否正在锁定倒计时
 };

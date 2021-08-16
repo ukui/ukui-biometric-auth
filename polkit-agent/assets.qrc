@@ -2,6 +2,8 @@
     <qresource prefix="/image">
         <file>assets/arrow_down.svg</file>
         <file>assets/arrow_right.svg</file>
+        <file>assets/hide-password.png</file>
+        <file>assets/show-password.png</file>
     </qresource>
     <qresource prefix="/qss">
         <file>src/main.qss</file>
