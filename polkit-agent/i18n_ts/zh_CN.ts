@@ -36,6 +36,11 @@
         <translation>使用生物识别</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.ui" line="348"/>
+        <source>use password</source>
+        <translation>使用密码验证</translation>
+    </message>
+    <message>
         <source>DeviceType:</source>
         <translation type="obsolete">设备类型：</translation>
     </message>
