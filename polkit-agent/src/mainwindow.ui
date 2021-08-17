@@ -115,14 +115,13 @@ line-height: 20px;</string>
               <height>25</height>
              </size>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">height: 20px;
+font-size: 14px;
+font-family: PingFangSC-Regular, PingFang SC;</string>
             </property>
             <property name="text">
              <string/>

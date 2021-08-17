@@ -144,6 +144,8 @@ MainWindow::MainWindow(QWidget *parent) :
     editIcon();
     ui->lblContent->adjustSize();
     ui->lblContent->height();
+    ui->lblMessage->adjustSize();
+    ui->lblMessage->height();
 }
 
 MainWindow::~MainWindow()
@@ -511,11 +513,11 @@ void MainWindow::setMessage(const QString &text,situation situat)
 {
     // QString message = this->check_is_pam_message(text);
     if(situat == ERROR){
-        ui->lblMessage->setStyleSheet("color: #F3222D;");
+        ui->lblMessage->setStyleSheet("font-size:14px;color: #F3222D;");
     }else if(situat == TRUE){
-        ui->lblMessage->setStyleSheet("");
+        ui->lblMessage->setStyleSheet("QLabel{font-size:14px;}");
     }
-    qDebug()<<"receive：text = "<<text;
+    // qDebug()<<"receive：text = "<<text;
     if (text.indexOf("account locked") != -1 || text.indexOf("账户已锁定") != -1 
         || text.indexOf("Account locked") != -1 || text.indexOf("永久锁定") != -1)
     {
@@ -541,8 +543,9 @@ void MainWindow::setAuthResult(bool result, const QString &text)
 {
     QString message = text;
 
-    if(!result && text.isEmpty())
+    if(!result && text.isEmpty()){
         message = tr("Authentication failed, please try again.");
+    }
 
     if(authMode == PASSWORD)
         setMessage(message,ERROR);
@@ -700,7 +703,7 @@ void MainWindow::switchWidget(Mode mode)
     case PASSWORD:
         setMinimumWidth(420);
         setMaximumWidth(420);
-        setMinimumHeight(211+ui->lblHeader->height()+ui->lblContent->height());
+        setMinimumHeight(186+ui->lblHeader->height()+ui->lblContent->height()+ui->lblMessage->height());
         setMaximumHeight(211+ui->lblHeader->height()+ui->lblContent->height());
         ui->btnBioAuth->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
 
@@ -790,10 +793,11 @@ void MainWindow::unlock_countdown()
         }
 
         if (isLockingFlg)
-        {
-            ui->lblMessage->setText("");
-        }
-            
+	{
+            setMessage(tr("Authentication failed, please try again."),ERROR);
+            isLockingFlg = false;
+	
+	}    
         m_timer->stop();
     }
     return ;
@@ -846,7 +850,7 @@ void MainWindow::root_unlock_countdown()
 
         if (isLockingFlg)
         {
-            setMessage(tr("Authentication failed, please try again."),TRUE);
+            setMessage(tr("Authentication failed, please try again."),ERROR);
             isLockingFlg = false;
         }
             
