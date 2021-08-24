@@ -225,7 +225,7 @@ line-height: 20px;</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>96</width>
+         <width>115</width>
          <height>36</height>
         </size>
        </property>
@@ -334,7 +334,7 @@ line-height: 20px;</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>96</width>
+         <width>115</width>
          <height>36</height>
         </size>
        </property>
