@@ -78,6 +78,7 @@ void BioAuthWidget::onBioAuthComplete(uid_t uid, bool ret)
 {
     setImage();
     dup_fd = -1;
+    ui->btnRetry->setVisible(true);
     Q_EMIT authComplete(uid, ret);
 }
 
