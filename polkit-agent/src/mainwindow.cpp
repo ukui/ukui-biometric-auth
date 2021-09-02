@@ -38,6 +38,7 @@
 #include "generic.h"
 #define _(string) gettext(string)
 extern void qt_blurImage(QImage &blurImage, qreal radius, bool quality, int transposed);
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
@@ -58,11 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     widgetBioAuth = new BioAuthWidget(this);
     widgetBioDevices = new BioDevicesWidget(this);
-    //ui->formLayout->addWidget(widgetBioAuth);
-    //ui->formLayout->addWidget(widgetBioDevices);
 
     ui->bioAuthLayout->addWidget(widgetBioAuth);
-    ui->bioAuthLayout->addWidget(widgetBioDevices);
+    ui->bioDeviceLayout->addWidget(widgetBioDevices);
 
     maxFailedTimes = bioDevices.getFailedTimes();
     isHiddenSwitchButton = bioDevices.GetHiddenSwitchButton();
@@ -511,9 +510,12 @@ QString MainWindow::check_is_pam_message(QString text)
 
 void MainWindow::setMessage(const QString &text,situation situat)
 {
+
     // QString message = this->check_is_pam_message(text);
     if(situat == ERROR){
         ui->lblMessage->setStyleSheet("font-size:14px;color: #F3222D;");
+        ui->lePassword->setStyleSheet("QLineEdit{background-color: palette(Button);"
+                                      "lineedit-password-character:42;border-radius: 6px;border: 1px solid #F3222D;}");
     }else if(situat == TRUE){
         ui->lblMessage->setStyleSheet("QLabel{font-size:14px;}");
     }
@@ -617,8 +619,11 @@ void MainWindow::switchAuthMode(Mode mode)
             return;
         } else if(authMode == BIOMETRIC) {
             DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
-            if(!device)
+            widgetBioDevices->setCurrentDevice( device);
+            if(!device){
                 device = bioDevices.getFirstDevice();
+                widgetBioDevices->setCurrentDevice( device);
+            }
             if(device) {
                 if(useDoubleAuth){
                     emit accept(BIOMETRIC_IGNORE);
@@ -698,7 +703,14 @@ void MainWindow::switchWidget(Mode mode)
     ui->btnAuth->hide();
     widgetBioAuth->hide();
     widgetBioDevices->hide();
-
+    ui->btnAuth->setText(tr("Authenticate"));
+    ui->btnAuth->adjustSize();
+    ui->btnBioAuth->setText(tr("Biometric"));
+    ui->btnBioAuth->adjustSize();
+    ui->btnCancel->setText(tr("Cancel"));
+    ui->btnCancel->adjustSize();
+    ui->returnButton->setText(tr("Use password"));
+    ui->returnButton->adjustSize();
     switch(mode){
     case PASSWORD:
         setMinimumWidth(420);
@@ -708,37 +720,45 @@ void MainWindow::switchWidget(Mode mode)
         ui->btnBioAuth->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
 
         ui->btnBioAuth->setFlat(true);
+        ui->btnBioAuth->setText(tr("Biometric"));
+        ui->btnBioAuth->setAttribute(Qt::WA_UnderMouse,false);
+        ui->btnBioAuth->adjustSize();
         ui->widgetPasswdAuth->show();
         ui->lePassword->setFocus();
         ui->lePassword->setAttribute(Qt::WA_InputMethodEnabled, false);
         ui->btnAuth->show();
         ui->btnCancel->show();
-        //ui->btnBioAuth->show();
         ui->lblContent->show();
         ui->returnButton->hide();
-        //ui->cmbDevices->hide();
         break;
+
     case BIOMETRIC:
         setMinimumWidth(420);
         setMaximumWidth(420);
-        setMinimumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
-        setMaximumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
-
+        if(bioDevices.count()<1||bioDevices.count()==1){
+            setMinimumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
+            setMaximumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
+        }
         widgetBioAuth->show();
+        if(bioDevices.count()>1){
+            widgetBioDevices->show();
+            setMinimumHeight(432+ui->cmbUsers->height()+ui->lblHeader->height());
+            setMaximumHeight(432+ui->cmbUsers->height()+ui->lblHeader->height());
+        }
         ui->btnCancel->hide();
         ui->lblContent->hide();
         ui->btnBioAuth->hide();
         ui->returnButton->show();
+        ui->returnButton->setAttribute(Qt::WA_UnderMouse,false);
         ui->returnButton->setFlat(true);
         ui->returnButton->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
-
-        //ui->btnBioAuth->hide();
-        //ui->cmbDevices->show();
+        ui->returnButton->setText(tr("Use password"));
+        ui->returnButton->adjustSize();
         break;
-    case DEVICES:
-        widgetBioAuth->show();
+//    case DEVICES:
+//        widgetBioAuth->show();
 
-        break;
+//        break;
     default:
         break;
     }
