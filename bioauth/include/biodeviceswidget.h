@@ -31,18 +31,19 @@ class BioDevicesWidget : public QWidget
 
 public:
     explicit BioDevicesWidget(QWidget *parent = 0);
+    void setCurrentDevice(DeviceInfo *device);
     ~BioDevicesWidget();
     void init(uid_t uid);
-
+    enum FLAG{FIRST,AGAIN};
 signals:
     void back();
     void deviceChanged(const DeviceInfo &device);
     void deviceCountChanged(int count);
 
 private slots:
-    void on_btnBack_clicked();
-    void on_btnOK_clicked();
-    void on_lwDevices_doubleClicked(const QModelIndex &);
+//    void on_btnBack_clicked();
+//    void on_btnOK_clicked();
+    void on_lwDevices_currentIndexChanged();
     void on_cmbDeviceTypes_currentIndexChanged(int index);
 
     void onDeviceCountChanged();

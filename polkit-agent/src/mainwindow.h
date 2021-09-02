@@ -106,6 +106,7 @@ private:
     bool isHiddenSwitchButton;
     QPushButton *m_modeButton;
     QTimer *m_timer;
+    //const DeviceInfo *device = NULL;
     bool isLockingFlg;   //判断当前是否正在锁定倒计时
 };
 
