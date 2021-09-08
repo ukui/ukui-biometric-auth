@@ -154,7 +154,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::restart_bio_identify()
 {
-    DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+    DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
     if(device){
         widgetBioAuth->startAuth(getUid(userName), *device);
         setMessage(tr("Please enter your password or enroll your fingerprint "));
@@ -597,7 +597,7 @@ void MainWindow::switchAuthMode(Mode mode)
 	    ui->btnBioAuth->hide();
 
         if(enableBioAuth && useDoubleAuth){
-            DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+            DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
             if(device){
                 widgetBioAuth->startAuth(getUid(userName), *device);
             }
@@ -618,7 +618,7 @@ void MainWindow::switchAuthMode(Mode mode)
             emit accept(BIOMETRIC_IGNORE);
             return;
         } else if(authMode == BIOMETRIC) {
-            DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+            DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
             widgetBioDevices->setCurrentDevice( device);
             if(!device){
                 device = bioDevices.getFirstDevice();
@@ -640,7 +640,7 @@ void MainWindow::switchAuthMode(Mode mode)
 
             if(enableBioAuth) {
                 qDebug() << "enable biometric authenticaion";
-                DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+                DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
                 if(device) {
                     if(useDoubleAuth){
                         emit accept(BIOMETRIC_IGNORE);
