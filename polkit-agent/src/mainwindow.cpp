@@ -154,7 +154,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::restart_bio_identify()
 {
-    DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
+    DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
     if(device){
         widgetBioAuth->startAuth(getUid(userName), *device);
         setMessage(tr("Please enter your password or enroll your fingerprint "));
@@ -597,7 +597,7 @@ void MainWindow::switchAuthMode(Mode mode)
 	    ui->btnBioAuth->hide();
 
         if(enableBioAuth && useDoubleAuth){
-            DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
+            DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
             if(device){
                 widgetBioAuth->startAuth(getUid(userName), *device);
             }
@@ -618,7 +618,7 @@ void MainWindow::switchAuthMode(Mode mode)
             emit accept(BIOMETRIC_IGNORE);
             return;
         } else if(authMode == BIOMETRIC) {
-            DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
+            DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
             widgetBioDevices->setCurrentDevice( device);
             if(!device){
                 device = bioDevices.getFirstDevice();
@@ -640,7 +640,7 @@ void MainWindow::switchAuthMode(Mode mode)
 
             if(enableBioAuth) {
                 qDebug() << "enable biometric authenticaion";
-                DeviceInfo *device = bioDevices.getDefaultDevice(getUid());
+                DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
                 if(device) {
                     if(useDoubleAuth){
                         emit accept(BIOMETRIC_IGNORE);
@@ -775,12 +775,20 @@ void MainWindow::unlock_countdown()
     pam_tally_unlock_time_left(&failed_count, &time_left, &deny,&fail_time,&unlock_time);
 
     // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
-    if(time_left/60 > 0)//请多少分钟后重试
+    int nMinuteleft = time_left/60;
+    if(nMinuteleft > 0)//请多少分钟后重试
     {
         char ch[100]={0};
-        int nMinute = time_left/60 + 1;
+        int nMinute = 0;
+        if (time_left == 60 )
+        {
+            nMinute = 1;
+        }else
+        {
+            nMinute = nMinuteleft + 1;
+        }
         setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
-        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
+        //ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -790,7 +798,7 @@ void MainWindow::unlock_countdown()
     {
         char ch[100]={0};
         setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
-        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
+        //ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
         ui->lePassword->setText("");
         ui->lePassword->setDisabled(true);
         isLockingFlg = true;
@@ -831,10 +839,18 @@ void MainWindow::root_unlock_countdown()
     pam_tally_root_unlock_time_left(&failed_count, &time_left, &deny);
 
     // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
-    if(time_left/60 > 0)//请多少分钟后重试
+    int nMinuteleft = time_left/60;
+    if(nMinuteleft > 0)//请多少分钟后重试
     {
         char ch[100]={0};
-        int nMinute = time_left/60 + 1;
+        int nMinute = 0;
+        if (time_left == 60 )
+        {
+            nMinute = 1;
+        }else
+        {
+            nMinute = nMinuteleft + 1;
+        }
         ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
         ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
         ui->lePassword->setText("");
