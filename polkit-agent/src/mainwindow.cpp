@@ -459,7 +459,7 @@ void MainWindow::setPrompt(const QString &text, bool echo)
     ui->lePassword->clear();
     ui->lePassword->setPlaceholderText(prompt);
     //ui->lblMessage->setText(prompt);
-    ui->lePassword->setEchoMode(echo ? QLineEdit::Normal : QLineEdit::Password);
+    ui->lePassword->setEchoMode(m_modeButton->isChecked() ? QLineEdit::Normal : QLineEdit::Password);
     switchWidget(PASSWORD);
 }
 
