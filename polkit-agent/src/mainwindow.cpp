@@ -25,7 +25,7 @@
 #include <QPixmap>
 #include <QFontMetrics>
 #include <QtMath>
-
+#include <QAbstractItemView>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -145,6 +145,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lblContent->height();
     ui->lblMessage->adjustSize();
     ui->lblMessage->height();
+    ui->cmbUsers->view()->setTextElideMode(Qt::ElideRight);
 }
 
 MainWindow::~MainWindow()
@@ -441,7 +442,7 @@ void MainWindow::setPrompt(const QString &text, bool echo)
     QString prompt = text;
 
     if(text == "Password: "){
-        prompt = tr("Password: ");
+        prompt = tr("Password");
         if(useDoubleAuth && widgetBioAuth && widgetBioAuth->isAuthenticating()){
             uid_t m_uid = getUid(userName);
             if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)

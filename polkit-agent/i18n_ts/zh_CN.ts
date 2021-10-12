@@ -27,13 +27,14 @@
         <translation type="obsolete">重新开始</translation>
     </message>
     <message>
+        <location filename="../src/mainwindow.cpp" line="445"/>
         <source>Password</source>
-        <translation type="obsolete">密码</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="237"/>
-        <location filename="../src/mainwindow.cpp" line="708"/>
-        <location filename="../src/mainwindow.cpp" line="723"/>
+        <location filename="../src/mainwindow.cpp" line="709"/>
+        <location filename="../src/mainwindow.cpp" line="724"/>
         <source>Biometric</source>
         <translation>使用生物识别</translation>
     </message>
