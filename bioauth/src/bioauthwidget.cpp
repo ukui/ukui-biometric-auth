@@ -33,8 +33,10 @@ BioAuthWidget::BioAuthWidget(QWidget *parent) :
     bioAuth(nullptr)
 {
     ui->setupUi(this);
+    ui->btnRetry->setFlat(true);
     ui->btnRetry->setVisible(false);
-    ui->btnMore->setVisible(false);
+    ui->btnRetry->setText(tr("Retry"));
+    //ui->btnMore->setVisible(false);
 }
 
 BioAuthWidget::~BioAuthWidget()
@@ -76,6 +78,7 @@ void BioAuthWidget::onBioAuthComplete(uid_t uid, bool ret)
 {
     setImage();
     dup_fd = -1;
+    ui->btnRetry->setVisible(true);
     Q_EMIT authComplete(uid, ret);
 }
 
@@ -127,6 +130,7 @@ void BioAuthWidget::onFrameWritten(int deviceId)
 
     cv::Mat mat2(1, sizeof(base64_bufferData), CV_8U, base64_bufferData);
     img = cv::imdecode(mat2, cv::IMREAD_COLOR);
+    cv::cvtColor(img,img,cv::COLOR_BGR2RGB);
 
     QImage srcQImage = QImage((uchar*)(img.data), img.cols, img.rows, QImage::Format_RGB888);
     ui->lblBioImage->setPixmap(QPixmap::fromImage(srcQImage).scaled(ui->lblBioImage->size()));
@@ -136,7 +140,7 @@ void BioAuthWidget::onFrameWritten(int deviceId)
 
 void BioAuthWidget::hidePasswdButton()
 {
-    ui->btnPasswdAuth->hide();
+    //ui->btnPasswdAuth->hide();
 }
 
 bool BioAuthWidget::isAuthenticating()
@@ -159,7 +163,7 @@ void BioAuthWidget::startAuth(uid_t uid, const DeviceInfo &device)
     this->uid = uid;
     this->device = device;
 
-    ui->lblBioDevice->setText(tr("Current Device: ") + device.device_shortname);
+    //ui->lblBioDevice->setText(tr("Current Device: ") + device.device_shortname);
 
     if(bioAuth) {
         bioAuth->stopAuth();
@@ -182,5 +186,5 @@ void BioAuthWidget::startAuth(uid_t uid, const DeviceInfo &device)
 
 void BioAuthWidget::setMoreDevices(bool hasMore)
 {
-    ui->btnMore->setVisible(hasMore);
+    //ui->btnMore->setVisible(hasMore);
 }

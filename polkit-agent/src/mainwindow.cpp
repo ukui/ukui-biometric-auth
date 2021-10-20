@@ -25,16 +25,19 @@
 #include <QPixmap>
 #include <QFontMetrics>
 #include <QtMath>
-
+#include <QAbstractItemView>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
 #include <libintl.h>
 #include <locale.h>
-
+#include "bioauthwidget.h"
+#include <QHBoxLayout>
+#include <QAction>
 #include "generic.h"
 #define _(string) gettext(string)
+extern void qt_blurImage(QImage &blurImage, qreal radius, bool quality, int transposed);
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
@@ -44,16 +47,22 @@ MainWindow::MainWindow(QWidget *parent) :
     receiveBioPAM(false),
     authMode(UNDEFINED),
     useDoubleAuth(false),
+    m_timer(nullptr),
+    isLockingFlg(false),
     isbioSuccess(false)
 {
     ui->setupUi(this);
     setWindowTitle(tr("Authentication"));
     setWindowFlags(Qt::WindowStaysOnTopHint);
 
+    pam_tally_init(); //
+
     widgetBioAuth = new BioAuthWidget(this);
     widgetBioDevices = new BioDevicesWidget(this);
-    ui->formLayout->addWidget(widgetBioAuth);
-    ui->formLayout->addWidget(widgetBioDevices);
+
+    ui->bioAuthLayout->addWidget(widgetBioAuth);
+    ui->bioDeviceLayout->addWidget(widgetBioDevices);
+
     maxFailedTimes = bioDevices.getFailedTimes();
     isHiddenSwitchButton = bioDevices.GetHiddenSwitchButton();
 
@@ -125,12 +134,18 @@ MainWindow::MainWindow(QWidget *parent) :
     setStyleSheet(qssFile.readAll());
     qssFile.close();
 
-    ui->cmbUsers->hide();
-    ui->widgetDetails->hide();
-    ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
-    ui->btnDetails->hide();
-    ui->lePassword->installEventFilter(this);
+    //ui->cmbUsers->hide();
+    //ui->widgetDetails->hide();
+    //ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
+    //ui->btnDetails->hide();
+    //ui->lePassword->installEventFilter(this);
     switchWidget(UNDEFINED);
+    editIcon();
+    ui->lblContent->adjustSize();
+    ui->lblContent->height();
+    ui->lblMessage->adjustSize();
+    ui->lblMessage->height();
+    ui->cmbUsers->view()->setTextElideMode(Qt::ElideRight);
 }
 
 MainWindow::~MainWindow()
@@ -140,7 +155,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::restart_bio_identify()
 {
-    DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+    DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
     if(device){
         widgetBioAuth->startAuth(getUid(userName), *device);
         setMessage(tr("Please enter your password or enroll your fingerprint "));
@@ -153,6 +168,52 @@ void MainWindow::closeEvent(QCloseEvent *event)
     emit canceled();
 
     return QWidget::closeEvent(event);
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+
+    Q_UNUSED(event);
+    QStyleOption *option = new QStyleOption();
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    QPainterPath rectPath;
+    rectPath.addRoundedRect(this->rect().adjusted(0,0,0,0),0,0);
+    // 画一个黑底
+    QPixmap pixmap(this->rect().size());
+    pixmap.fill(Qt::transparent);
+    QPainter pixmapPainter(&pixmap);
+    pixmapPainter.setRenderHint(QPainter::Antialiasing);
+    pixmapPainter.setPen(Qt::transparent);
+    pixmapPainter.setBrush(QColor(0,0,0,100));
+    pixmapPainter.drawPath(rectPath);
+    pixmapPainter.end();
+
+    // 模糊这个黑底
+    QImage img = pixmap.toImage();
+    qt_blurImage(img, 10, false, false);
+
+    // 挖掉中心
+    pixmap = QPixmap::fromImage(img);
+    QPainter pixmapPainter2(&pixmap);
+    pixmapPainter2.setRenderHint(QPainter::Antialiasing);
+    pixmapPainter2.setCompositionMode(QPainter::CompositionMode_Clear);
+    pixmapPainter2.setPen(Qt::transparent);
+    pixmapPainter2.setBrush(Qt::transparent);
+    pixmapPainter2.drawPath(rectPath);
+
+    // 绘制阴影
+    p.drawPixmap(this->rect(), pixmap, pixmap.rect());
+
+    // 绘制一个背景
+    p.save();
+    p.fillPath(rectPath,option->palette.color(QPalette::Base));
+    p.restore();
+    //绘制一个矩形
+
+    p.setPen(Qt::red);
+    QRectF rect(0,290,20,20);
+
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -214,7 +275,7 @@ int MainWindow::enable_biometric_authentication()
 }
 
 void MainWindow::on_btnDetails_clicked()
-{
+{/*
     if(ui->widgetDetails->isHidden()) {
         ui->widgetDetails->show();
         ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_down.svg"));
@@ -225,7 +286,7 @@ void MainWindow::on_btnDetails_clicked()
         ui->btnDetails->setIcon(QIcon(":/image/assets/arrow_right.svg"));
 //        resize(width(), height() - ui->widgetDetails->height());
     }
-    adjustSize();
+    adjustSize();*/
 }
 
 void MainWindow::on_btnCancel_clicked()
@@ -239,12 +300,40 @@ void MainWindow::on_btnAuth_clicked()
 }
 
 /*** pagePassword ***/
+void MainWindow::editIcon()
+{
+    m_modeButton = new QPushButton(ui->lePassword);
+    m_modeButton->setObjectName(QStringLiteral("echoModeButton"));
+    m_modeButton->setCheckable(true);
+    m_modeButton->setFocusPolicy(Qt::NoFocus);
+    m_modeButton->setCursor(Qt::PointingHandCursor);
+    connect(m_modeButton, &QPushButton::clicked, this, [&](bool checked){
+        setType(checked ? QLineEdit::Normal : QLineEdit::Password);
+    });
+    QHBoxLayout *layout = new QHBoxLayout(ui->lePassword);
+    //layout->setSpacing(0);
+    layout->addStretch();
+    layout->addWidget(m_modeButton);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+
+}
+
+void MainWindow::setType(QLineEdit::EchoMode type)
+{
+    ui->lePassword->setEchoMode(type);
+    if(type == 0)
+       m_modeButton->setChecked(true);
+    else
+       m_modeButton->setChecked(false);
+}
 
 void MainWindow::on_lePassword_returnPressed()
 {
     emit accept(ui->lePassword->text());
-    switchWidget(UNDEFINED);
-    setMessage(tr("in authentication, please wait..."));
+    ui->btnAuth->hide();
+    // switchWidget(UNDEFINED);
+    // setMessage(tr("in authentication, please wait..."));
 }
 
 void MainWindow::on_btnBioAuth_clicked()
@@ -253,6 +342,13 @@ void MainWindow::on_btnBioAuth_clicked()
     authMode = BIOMETRIC;
 }
 
+void MainWindow::on_returnButton_clicked()
+{
+
+    widgetBioAuth->stopAuth();
+    accept(BIOMETRIC_IGNORE);
+
+}
 /*** end of control's slot ***/
 
 
@@ -285,12 +381,14 @@ void MainWindow::setIcon(const QString &iconName)
     painter.end();
 
     setWindowIcon(icon);
-    ui->lblIcon->setPixmap(icon);
+    //ui->lblIcon->setPixmap(icon);
 }
 
 void MainWindow::setHeader(const QString &text)
 {
     ui->lblHeader->setText(text);
+    ui->lblHeader->adjustSize();
+    ui->lblHeader->height();
     ui->lblContent->setText(tr("An application is attempting to perform an action that requires privileges."
                             " Authentication is required to perform this action."));
 
@@ -323,8 +421,10 @@ void MainWindow::setUsers(const QStringList &usersList)
     }
 
     ui->cmbUsers->show();
+    ui->cmbUsers->adjustSize();
+    ui->cmbUsers->height();
 }
-
+/*
 void MainWindow::setDetails(const QString &subPid, const QString &callerPid, const QString &actionId,
                             const QString &actionDesc, const QString vendorName,
                             const QString vendorUrl)
@@ -336,22 +436,31 @@ void MainWindow::setDetails(const QString &subPid, const QString &callerPid, con
     QString vendor = QString("<a href=\"%1\">%2").arg(vendorUrl).arg(vendorName);
     ui->lblVendor->setText(vendor);
 }
-
+*/
 void MainWindow::setPrompt(const QString &text, bool echo)
 {
     QString prompt = text;
 
     if(text == "Password: "){
-        prompt = tr("Password: ");
+        prompt = tr("Password");
         if(useDoubleAuth && widgetBioAuth && widgetBioAuth->isAuthenticating()){
             uid_t m_uid = getUid(userName);
             if(!m_failMap.contains(m_uid) || m_failMap[m_uid] < maxFailedTimes)
                 setMessage(tr("Please enter your password or enroll your fingerprint "));
         }
     }
+    if(!m_timer){
+            m_timer = new QTimer(this);
+            m_timer->setInterval(200);
+            connect(m_timer, &QTimer::timeout, this, &MainWindow::unlock_countdown);
+        }
+        //qDebug() << "6666";
+        m_timer->start();
 
-    ui->lblPrompt->setText(prompt);
-    ui->lePassword->setEchoMode(echo ? QLineEdit::Normal : QLineEdit::Password);
+    ui->lePassword->clear();
+    ui->lePassword->setPlaceholderText(prompt);
+    //ui->lblMessage->setText(prompt);
+    ui->lePassword->setEchoMode(m_modeButton->isChecked() ? QLineEdit::Normal : QLineEdit::Password);
     switchWidget(PASSWORD);
 }
 
@@ -400,23 +509,51 @@ QString MainWindow::check_is_pam_message(QString text)
 
 }
 
-void MainWindow::setMessage(const QString &text)
+void MainWindow::setMessage(const QString &text,situation situat)
 {
+
     // QString message = this->check_is_pam_message(text);
-    ui->lblMessage->setText(text);
+    if(situat == ERROR){
+        ui->lblMessage->setStyleSheet("font-size:14px;color: #F3222D;");
+        ui->lePassword->setStyleSheet("QLineEdit{background-color: palette(Button);"
+                                      "lineedit-password-character:42;border-radius: 6px;border: 1px solid #F3222D;}");
+    }else if(situat == TRUE){
+        ui->lblMessage->setStyleSheet("QLabel{font-size:14px;}");
+    }
+    // qDebug()<<"receive：text = "<<text;
+    if (text.indexOf("account locked") != -1 || text.indexOf("账户已锁定") != -1 
+        || text.indexOf("Account locked") != -1 || text.indexOf("永久锁定") != -1)
+    {
+        if(!m_timer){
+            m_timer = new QTimer(this);
+            m_timer->setInterval(800);
+            connect(m_timer, &QTimer::timeout, this, &MainWindow::unlock_countdown);
+        }
+        m_timer->start();
+    }else if (text.indexOf("No password received, please input password") != -1)
+    {
+        ui->lblMessage->setText(tr("Password cannot be empty"));
+        ui->lblMessage->setToolTip(tr("Password cannot be empty"));
+    }else{
+        ui->lblMessage->setText(text);
+        ui->lblMessage->setToolTip(text);
+    }
+
+    // ui->lblMessage->setText(text);
 }
 
 void MainWindow::setAuthResult(bool result, const QString &text)
 {
     QString message = text;
 
-    if(!result && text.isEmpty())
+    if(!result && text.isEmpty()){
         message = tr("Authentication failed, please try again.");
+    }
 
     if(authMode == PASSWORD)
-        ui->lblMessage->setText(message);
-//    else if(authMode == BIOMETRIC)
-//        ui->lblBioNotify->setText(message);
+        setMessage(message,ERROR);
+    else if(authMode == BIOMETRIC)
+        setMessage(message,ERROR);
 
     switchWidget(PASSWORD);
 }
@@ -461,7 +598,7 @@ void MainWindow::switchAuthMode(Mode mode)
 	    ui->btnBioAuth->hide();
 
         if(enableBioAuth && useDoubleAuth){
-            DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+            DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
             if(device){
                 widgetBioAuth->startAuth(getUid(userName), *device);
             }
@@ -482,9 +619,12 @@ void MainWindow::switchAuthMode(Mode mode)
             emit accept(BIOMETRIC_IGNORE);
             return;
         } else if(authMode == BIOMETRIC) {
-            DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
-            if(!device)
+            DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
+            widgetBioDevices->setCurrentDevice( device);
+            if(!device){
                 device = bioDevices.getFirstDevice();
+                widgetBioDevices->setCurrentDevice( device);
+            }
             if(device) {
                 if(useDoubleAuth){
                     emit accept(BIOMETRIC_IGNORE);
@@ -501,7 +641,7 @@ void MainWindow::switchAuthMode(Mode mode)
 
             if(enableBioAuth) {
                 qDebug() << "enable biometric authenticaion";
-                DeviceInfo *device = bioDevices.getDefaultDevice(getUid(userName));
+                DeviceInfo *device = bioDevices.getDefaultDevice(getuid());
                 if(device) {
                     if(useDoubleAuth){
                         emit accept(BIOMETRIC_IGNORE);
@@ -564,25 +704,196 @@ void MainWindow::switchWidget(Mode mode)
     ui->btnAuth->hide();
     widgetBioAuth->hide();
     widgetBioDevices->hide();
-
+    ui->btnAuth->setText(tr("Authenticate"));
+    ui->btnAuth->adjustSize();
+    ui->btnBioAuth->setText(tr("Biometric"));
+    ui->btnBioAuth->adjustSize();
+    ui->btnCancel->setText(tr("Cancel"));
+    ui->btnCancel->adjustSize();
+    ui->returnButton->setText(tr("Use password"));
+    ui->returnButton->adjustSize();
     switch(mode){
     case PASSWORD:
         setMinimumWidth(420);
+        setMaximumWidth(420);
+        setMinimumHeight(186+ui->lblHeader->height()+ui->lblContent->height()+ui->lblMessage->height());
+        setMaximumHeight(211+ui->lblHeader->height()+ui->lblContent->height());
+        ui->btnBioAuth->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
+
+        ui->btnBioAuth->setFlat(true);
+        ui->btnBioAuth->setText(tr("Biometric"));
+        ui->btnBioAuth->setAttribute(Qt::WA_UnderMouse,false);
+        ui->btnBioAuth->adjustSize();
         ui->widgetPasswdAuth->show();
         ui->lePassword->setFocus();
         ui->lePassword->setAttribute(Qt::WA_InputMethodEnabled, false);
         ui->btnAuth->show();
+        ui->btnCancel->show();
+        ui->lblContent->show();
+        ui->returnButton->hide();
         break;
+
     case BIOMETRIC:
-        setMaximumWidth(380);
+        setMinimumWidth(420);
+        setMaximumWidth(420);
+        if(bioDevices.count()<1||bioDevices.count()==1){
+            setMinimumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
+            setMaximumHeight(342+ui->cmbUsers->height()+ui->lblHeader->height());
+        }
         widgetBioAuth->show();
+        if(bioDevices.count()>1){
+            widgetBioDevices->show();
+            setMinimumHeight(432+ui->cmbUsers->height()+ui->lblHeader->height());
+            setMaximumHeight(432+ui->cmbUsers->height()+ui->lblHeader->height());
+        }
+        ui->btnCancel->hide();
+        ui->lblContent->hide();
+        ui->btnBioAuth->hide();
+        ui->returnButton->show();
+        ui->returnButton->setAttribute(Qt::WA_UnderMouse,false);
+        ui->returnButton->setFlat(true);
+        ui->returnButton->setStyleSheet("QPushButton{font-size:14px;}QPushButton:hover{border:none;color:#3E6CE5;}QPushButton:pressed{border:none;}");
+        ui->returnButton->setText(tr("Use password"));
+        ui->returnButton->adjustSize();
         break;
-    case DEVICES:
-        widgetBioDevices->show();
+//    case DEVICES:
+//        widgetBioAuth->show();
+
+//        break;
     default:
         break;
     }
     adjustSize();
+}
+
+void MainWindow::unlock_countdown()
+{
+    int failed_count = 0;
+    int time_left = 0;
+    int deny = 0;
+    int fail_time =0;
+    int unlock_time = 0;
+    pam_tally_unlock_time_left(&failed_count, &time_left, &deny,&fail_time,&unlock_time);
+
+    // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
+    int nMinuteleft = time_left/60;
+    if(nMinuteleft > 0)//请多少分钟后重试
+    {
+        char ch[100]={0};
+        int nMinute = 0;
+        if (time_left == 60 )
+        {
+            nMinute = 1;
+        }else
+        {
+            nMinute = nMinuteleft + 1;
+        }
+        setMessage(tr("Please try again in %1 minutes.").arg(nMinute),TRUE);
+        //ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if(time_left > 0)//请多少秒后重试
+    {
+        char ch[100]={0};
+        setMessage(tr("Please try again in %1 seconds.").arg(time_left%60),TRUE);
+        //ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if (failed_count == 0xFFFF)//账号被永久锁定
+    {
+        ui->lblMessage->setText(tr("Account locked permanently."));
+        ui->lblMessage->setToolTip(tr("Account locked permanently."));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else
+    {
+        if(ui->lePassword){
+            ui->lePassword->setDisabled(false);
+            ui->lePassword->setFocus();
+        }
+
+        if (isLockingFlg)
+	{
+            setMessage(tr("Authentication failed, please try again."),ERROR);
+            isLockingFlg = false;
+	
+	}    
+        m_timer->stop();
+    }
+    return ;
+}
+
+void MainWindow::root_unlock_countdown()
+{
+    int failed_count = 0;
+    int time_left = 0;
+    int deny = 0;
+    pam_tally_root_unlock_time_left(&failed_count, &time_left, &deny);
+
+    // qDebug() << "failed_count:" << failed_count << "time_left:" <<time_left <<"deny:"<<deny<<"fail_time:"<< fail_time<<"unlock_time:" << unlock_time;
+    int nMinuteleft = time_left/60;
+    if(nMinuteleft > 0)//请多少分钟后重试
+    {
+        char ch[100]={0};
+        int nMinute = 0;
+        if (time_left == 60 )
+        {
+            nMinute = 1;
+        }else
+        {
+            nMinute = nMinuteleft + 1;
+        }
+        ui->lblMessage->setText(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 minutes.").arg(nMinute));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if(time_left > 0)//请多少秒后重试
+    {
+        char ch[100]={0};
+        ui->lblMessage->setText(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lblMessage->setToolTip(tr("Please try again in %1 seconds.").arg(time_left%60));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else if (failed_count == 0xFFFF)//账号被永久锁定
+    {
+        ui->lblMessage->setText(tr("Account locked permanently."));
+        ui->lblMessage->setToolTip(tr("Account locked permanently."));
+        ui->lePassword->setText("");
+        ui->lePassword->setDisabled(true);
+        isLockingFlg = true;
+        return ;
+    }
+    else
+    {
+        if(ui->lePassword){
+            ui->lePassword->setDisabled(false);
+            ui->lePassword->setFocus();
+        }
+
+        if (isLockingFlg)
+        {
+            setMessage(tr("Authentication failed, please try again."),ERROR);
+            isLockingFlg = false;
+        }
+            
+        m_timer->stop();
+    }
+    return ;
 }
 
 /*** end of private member ***/

@@ -113,15 +113,17 @@ void PolkitListener::initiateAuthentication(
     /* Create the polkit window */
 
     mainWindow = new MainWindow;
+    mainWindow->setWindowFlags(Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
     mainWindow->setIcon(iconName);
     mainWindow->setHeader(message);
     mainWindow->setUsers(usersList);
+    /*
     mainWindow->setDetails(subjectPid, callerPid,
                            actionDesc.actionId(),
                            actionDesc.description(),
                            actionDesc.vendorName(),
                            actionDesc.vendorUrl());
-
+    */
     /* set the position of the mainwindow */
     QPoint pos = QCursor::pos();
     for(auto screen : QGuiApplication::screens())
@@ -211,19 +213,22 @@ void PolkitListener::finishObtainPrivilege()
                     .arg(mainWindow != NULL);
 
     if (!gainedAuthorization && !wasCancelled && (mainWindow != NULL)) {
-        int deny = 0, unlock_time = 0;
-        mainWindow->stopDoubleAuth();
-        if(!get_pam_tally(&deny, &unlock_time)||(deny  == 0 &&unlock_time == 0)) {
-            if(!wasSwitchToBiometric){
-                mainWindow->setAuthResult(gainedAuthorization, tr("Authentication failure, please try again."));
-            }
-            startAuthentication();
+         int deny = 0, unlock_time = 0;
+         mainWindow->stopDoubleAuth();
+         if(!get_pam_tally(&deny, &unlock_time)||(deny  == 0 &&unlock_time == 0)) {
+             //if(!wasSwitchToBiometric){
+                 mainWindow->setAuthResult(gainedAuthorization, tr("Authentication failure, please try again."));
+             //}
+             startAuthentication();
+             return;
+         }
+         else {
+             startAuthentication();
+             return;
+         }
+        
+        startAuthentication();
             return;
-        }
-        else {
-            startAuthentication();
-            return;
-        }
     }
 
     if (mainWindow) {

@@ -38,7 +38,7 @@ extern int logger(char *format, ...);
 
 static int ukui_biometric_lock = 0;
 int enable_biometric_authentication(pam_handle_t *pamh);
-
+int enable_biometric_auth_double();
 /* GUI child process alive status */
 static int child_alive = 1;
 /* Signal handler */

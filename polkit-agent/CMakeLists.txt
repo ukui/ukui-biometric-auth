@@ -31,6 +31,7 @@ set(polkit_SRCS
     src/PolkitListener.cpp
     src/sessionmanager.cpp
     src/users.cpp
+    src/pam-tally.c
     ../common/generic.cpp
     )
 
@@ -39,6 +40,7 @@ target_link_libraries(polkit-ukui-authentication-agent-1
     Qt5::Core Qt5::Widgets Qt5::DBus
     ${POLKITQT-1_LIBRARIES}
     BioAuthWidgets
+    -lrt
     )
 install(TARGETS polkit-ukui-authentication-agent-1
     DESTINATION lib/${CMAKE_LIBRARY_ARCHITECTURE}/ukui-polkit)

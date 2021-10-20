@@ -1,6 +1,11 @@
 #btnCancel, #btnAuth {
-    min-height: 24px;
-    min-width: 80px;
+    min-height: 20px;
+    min-width: 28px;
+    font-size:14px;
+    font-family: PingFangSC-Regular, PingFang SC;
+
+    font-weight: 400;
+    line-height: 20px;
 }
 
 #btnDetails {
@@ -12,3 +17,36 @@
 #lwDevices::item {
     height: 30px;
 }
+
+#lblHeader{
+    font-size: 18px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: 500;
+
+    line-height: 25px;
+}
+
+#lblContent{
+    font-size: 14px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+
+    line-height: 20px;
+}
+
+
+#echoModeButton {
+    background: transparent;
+    qproperty-flat: true;
+    margin-right: 4px;
+    border: none;
+    border-width: 0;
+    image: url(:/image/assets/hide-password.png);
+    max-width: 16px;
+    max-height: 16px;
+    margin-right: 5px;
+}
+#echoModeButton::checked {
+    image: url(:/image/assets/show-password.png);
+}
+
