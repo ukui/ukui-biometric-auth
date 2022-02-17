@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Kylin Team <team+kylin@tracker.debian.org>
 Uploaders: handsome_feng <jianfengli@ubuntukylin.com>
-Build-Depends: debhelper-compat (= 12),
+Build-Depends: debhelper-compat (= 13),
                cmake (>= 2.6),
                qtbase5-dev,
                libpam-dev,
@@ -13,7 +13,7 @@ Build-Depends: debhelper-compat (= 12),
                qttools5-dev,
                qttools5-dev-tools,
                pkg-config
-Standards-Version: 4.5.0
+Standards-Version: 4.6.0.1
 Rules-Requires-Root: no
 Homepage: https://github.com/ukui/ukui-biometric-auth
 Vcs-Git: https://github.com/ukui/ukui-biometric.git

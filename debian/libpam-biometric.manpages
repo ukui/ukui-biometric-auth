@@ -1,3 +1,5 @@
 man/bioctl.1
 man/bioauth.1
 man/biodrvctl.1
+man/bioctl-helper.1
+man/biorestart.1
