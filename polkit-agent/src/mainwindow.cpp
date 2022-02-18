@@ -36,6 +36,7 @@
 #include <QHBoxLayout>
 #include <QAction>
 #include "generic.h"
+#include <QPainterPath>
 #define _(string) gettext(string)
 extern void qt_blurImage(QImage &blurImage, qreal radius, bool quality, int transposed);
 
@@ -467,7 +468,7 @@ void MainWindow::setPrompt(const QString &text, bool echo)
 /*
     转换pam英文提示，目前转换的就3个翻译
     Authenticated failed, account locked!
-    Authenticated failed, 1 login attemps left
+    Authenticated failed, 1 login attempts left
     Account locked, 4 minutes left
 */
 QString MainWindow::check_is_pam_message(QString text)
@@ -482,8 +483,8 @@ QString MainWindow::check_is_pam_message(QString text)
     str=ba.data();
 
     int a,b;
-    if(sscanf(str,"Authenticated failed, %d login attemps left",&a))
-          sprintf(str,_("Authenticated failed, %d login attemps left"),a);
+    if(sscanf(str,"Authenticated failed, %d login attempts left",&a))
+          sprintf(str,_("Authenticated failed, %d login attempts left"),a);
     else if(text.contains("days",Qt::CaseSensitive) && sscanf(str,"Account locked, %d days left",&a)){
         strTrans = tr("Account locked,") + QString("%1 ").arg(a) + tr("days left");
         return strTrans;
